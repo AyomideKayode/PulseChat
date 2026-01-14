@@ -35,7 +35,15 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`💫 PulseChat is running on: http://localhost:${PORT}`);
-  connectDB();
-});
+try {
+  // 1. Establish the "source of truth" first
+  await connectDB();
+
+  // 2. Only then open the gates to users
+  app.listen(PORT, () => {
+    console.log(`💫 PulseChat is running on: http://localhost:${PORT}`);
+  });
+} catch (error) {
+  console.error('Failed to start PulseChat:', error);
+  process.exit(1);
+}
