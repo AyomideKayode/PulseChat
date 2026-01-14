@@ -1,0 +1,21 @@
+{
+  "name": "pulsechat",
+  "version": "0.0.1",
+  "description": "A chat application with authentication, realtime messages, online indicators, notification sounds, with image uploads.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+    "start": "npm run start --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AyomideKayode/PulseChat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AyomideKayode/PulseChat/issues"
+  },
+  "homepage": "https://github.com/AyomideKayode/PulseChat#readme"
+}
