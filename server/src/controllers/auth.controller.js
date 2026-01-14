@@ -35,19 +35,15 @@ export const signup = async (req, res) => {
       password: hashedPassword,
     });
 
-    if (newUser) {
-      await newUser.save(); // Ensure User exists in the DB
-      generateToken(newUser._id, res); // Give them the keys to the kingdom
+    await newUser.save(); // Ensure User exists in the DB
+    generateToken(newUser._id, res); // Give them the keys to the kingdom
 
-      return res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePicture: newUser.profilePicture,
-      });
-    } else {
-      return res.status(400).json({ message: 'Invalid user data.' });
-    }
+    return res.status(201).json({
+      _id: newUser._id,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      profilePicture: newUser.profilePicture,
+    });
   } catch (error) {
     console.error('Error during signup:', error);
     return res.status(500).json({ message: 'Internal server error.' });
