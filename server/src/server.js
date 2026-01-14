@@ -4,6 +4,7 @@ import path from 'path';
 // Route imports
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import { connectDB } from './lib/db.js';
 
 dotenv.config();
 
@@ -13,7 +14,6 @@ const __dirname = path.resolve();
 
 // Middleware for parsing JSON bodies
 app.use(express.json());
-
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -37,4 +37,5 @@ if (process.env.NODE_ENV === 'production') {
 
 app.listen(PORT, () => {
   console.log(`💫 PulseChat is running on: http://localhost:${PORT}`);
+  connectDB();
 });
