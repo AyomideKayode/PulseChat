@@ -1,6 +1,7 @@
 import { sendWelcomeEmail } from '../emails/emailHandlers.js';
 import { generateToken } from '../lib/utils.js';
 import { ENV } from '../lib/env.js';
+import cloudinary from '../lib/cloudinary.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 
@@ -100,4 +101,57 @@ export const login = async (req, res) => {
 export const logout = (_, res) => {
   res.cookie('jwt', '', { maxAge: 0 });
   return res.status(200).json({ message: 'Logged out successfully.' });
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { fullName, profilePicture } = req.body;
+    const userId = req.user._id;
+
+    if (!fullName && !profilePicture) {
+      return res.status(400).json({
+        message: 'At least one field is required',
+      });
+    }
+
+    const updatedData = {}; // Prepare an object to hold updated fields
+    if (fullName) updatedData.fullName = fullName;
+    // only upload if a new profile picture is provided
+    if (profilePicture) {
+      // delete old picture from cloudinary if exists
+      const currentUser = await User.findById(userId);
+
+      if (!currentUser)
+        return res.status(404).json({ message: 'User not found.' });
+
+      if (currentUser?.profilePicture?.publicId) {
+        try {
+          await cloudinary.uploader.destroy(
+            currentUser.profilePicture.publicId
+          );
+        } catch (destroyError) {
+          console.error('Failed to delete old profile picture:', destroyError);
+          // Continue with upload - old image cleanup can be handled separately
+        }
+      }
+      // upload new picture
+      const uploadResponse = await cloudinary.uploader.upload(profilePicture);
+      // set new profile picture data
+      updatedData.profilePicture = {
+        url: uploadResponse.secure_url,
+        publicId: uploadResponse.public_id,
+      };
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updatedData },
+      { new: true }
+    ).select('-password');
+
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
 };

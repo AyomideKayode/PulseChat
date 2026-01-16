@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { ENV } from './env.js';
 
+// Utility function to generate JWT and set it as an HTTP-only cookie
 export const generateToken = (userId, res) => {
   const { JWT_SECRET } = ENV;
   if (!JWT_SECRET) {
