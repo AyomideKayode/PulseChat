@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 
 // Route imports
@@ -12,7 +13,10 @@ const PORT = ENV.PORT || 8080;
 const __dirname = path.resolve();
 
 // Middleware for parsing JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
+// Middleware for parsing cookies
+app.use(cookieParser());
 
 // API Routes
 app.use('/api/auth', authRoutes);
