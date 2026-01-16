@@ -120,9 +120,21 @@ export const updateProfile = async (req, res) => {
     if (profilePicture) {
       // delete old picture from cloudinary if exists
       const currentUser = await User.findById(userId);
+
+      if (!currentUser)
+        return res.status(404).json({ message: 'User not found.' });
+
       if (currentUser?.profilePicture?.publicId) {
-        await cloudinary.uploader.destroy(currentUser.profilePicture.publicId);
+        try {
+          await cloudinary.uploader.destroy(
+            currentUser.profilePicture.publicId
+          );
+        } catch (destroyError) {
+          console.error('Failed to delete old profile picture:', destroyError);
+          // Continue with upload - old image cleanup can be handled separately
+        }
       }
+      // upload new picture
       const uploadResponse = await cloudinary.uploader.upload(profilePicture);
       // set new profile picture data
       updatedData.profilePicture = {
@@ -136,9 +148,6 @@ export const updateProfile = async (req, res) => {
       { $set: updatedData },
       { new: true }
     ).select('-password');
-
-    if (!updatedUser)
-      return res.status(404).json({ message: 'User not found.' });
 
     return res.status(200).json(updatedUser);
   } catch (error) {
