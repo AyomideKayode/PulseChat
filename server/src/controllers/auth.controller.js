@@ -118,8 +118,17 @@ export const updateProfile = async (req, res) => {
     if (fullName) updatedData.fullName = fullName;
     // only upload if a new profile picture is provided
     if (profilePicture) {
+      // delete old picture from cloudinary if exists
+      const currentUser = await User.findById(userId);
+      if (currentUser?.profilePicture?.publicId) {
+        await cloudinary.uploader.destroy(currentUser.profilePicture.publicId);
+      }
       const uploadResponse = await cloudinary.uploader.upload(profilePicture);
-      updatedData.profilePicture = uploadResponse.secure_url;
+      // set new profile picture data
+      updatedData.profilePicture = {
+        url: uploadResponse.secure_url,
+        publicId: uploadResponse.public_id,
+      };
     }
 
     const updatedUser = await User.findByIdAndUpdate(
