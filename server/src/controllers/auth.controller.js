@@ -1,4 +1,6 @@
+import { sendWelcomeEmail } from '../emails/emailHandlers.js';
 import { generateToken } from '../lib/utils.js';
+import { ENV } from '../lib/env.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 
@@ -37,14 +39,27 @@ export const signup = async (req, res) => {
       password: hashedPassword,
     });
 
-    await newUser.save(); // Ensure User exists in the DB
-    generateToken(newUser._id, res); // Give them the keys to the kingdom
+    const savedUser = await newUser.save(); // Ensure User exists in the DB
+    generateToken(savedUser._id, res); // Give them the keys to the kingdom
+
+    // send welcome email to new users
+    try {
+      await sendWelcomeEmail(
+        savedUser.email,
+        savedUser.fullName,
+        ENV.CLIENT_URL
+      );
+    } catch (error) {
+      // We catch this separately so that if the email fails,
+      // the user still gets their "Account Created" success response.
+      console.error('Failed to send welcome email (non-blocking):', error);
+    }
 
     return res.status(201).json({
-      _id: newUser._id,
-      fullName: newUser.fullName,
-      email: newUser.email,
-      profilePicture: newUser.profilePicture,
+      _id: savedUser._id,
+      fullName: savedUser.fullName,
+      email: savedUser.email,
+      profilePicture: savedUser.profilePicture,
     });
   } catch (error) {
     console.error('Error during signup:', error);

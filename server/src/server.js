@@ -1,15 +1,14 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import path from 'path';
+
 // Route imports
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import { connectDB } from './lib/db.js';
-
-dotenv.config();
+import { ENV } from './lib/env.js';
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = ENV.PORT || 8080;
 const __dirname = path.resolve();
 
 // Middleware for parsing JSON bodies
@@ -20,7 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
 // Serve static files from the React frontend app
-if (process.env.NODE_ENV === 'production') {
+if (ENV.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
   // Handle React routing, return all requests to React app
   app.get('*path', (req, res) => {
