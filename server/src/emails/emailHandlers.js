@@ -5,8 +5,12 @@ export const sendWelcomeEmail = async (email, name, clientURL) => {
   if (!sender?.email || !sender?.name) {
     throw new Error('Sender email or name is not configured properly');
   }
-  if (!email) throw new Error('Recipient email is required to send welcome email');
-  if (!name) throw new Error('Recipient name is required to send welcome email');
+  if (!email)
+    throw new Error('Recipient email is required to send welcome email');
+  if (!name)
+    throw new Error('Recipient name is required to send welcome email');
+  if (!clientURL)
+    throw new Error('Client URL is required to send welcome email');
 
   const { data, error } = await resendClient.emails.send({
     from: `${sender.name} <${sender.email}>`,
