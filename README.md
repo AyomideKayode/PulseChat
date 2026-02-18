@@ -1,5 +1,9 @@
-# PulseChat: The Real-time Engine
+# PulseChat: The Real-time Communication Engine
 
-A chat application with authentication, realtime messages, online indicators, notification sounds, with image uploads.
+> A chat application with secure authentication, real-time messaging, online status indicators, notification sounds, with image uploads.
 
-Socket server using socket.io for realtime features, Node.js & Express for backend, MongoDB, Resend to send emails, Arcjet to implement rate limiting, jwt for auth & cloudinary for img uploads... React as frontend lib, Tailwind css, Daisy UI for styling, Zustand for state management.
+Architecture: Socket.io server for real-time bidirectional communication.
+Security: Rate limiting with Arcjet, JWT authentication.
+Backend: Node.js & Express with MongoDB.
+Frontend: React, Tailwind CSS, Daisy UI, Zustand for state management.
+Integrations: Resend (Email), Cloudinary (Image Uploads).

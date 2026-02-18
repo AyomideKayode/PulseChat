@@ -9,7 +9,7 @@ import { connectDB } from './lib/db.js';
 import { ENV } from './lib/env.js';
 
 const app = express();
-const PORT = ENV.PORT || 8080;
+const PORT = ENV.PORT || 3000;
 const __dirname = path.resolve();
 
 // Middleware for parsing JSON bodies
