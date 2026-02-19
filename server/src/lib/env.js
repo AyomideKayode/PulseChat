@@ -25,6 +25,7 @@ const requiredInProd = [
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
   'CLOUDINARY_API_SECRET',
+  'ARCJET_KEY',
 ];
 if (ENV.NODE_ENV === 'production') {
   requiredInProd.forEach((varName) => {

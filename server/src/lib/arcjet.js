@@ -1,6 +1,10 @@
 import arcjet, { shield, detectBot, slidingWindow } from '@arcjet/node';
 import { ENV } from './env.js';
 
+if (!ENV.ARCJET_KEY) {
+  throw new Error('Missing required environment variable: ARCJET_KEY');
+}
+
 const aj = arcjet({
   key: ENV.ARCJET_KEY,
   rules: [
@@ -18,7 +22,7 @@ const aj = arcjet({
         //"CATEGORY:PREVIEW", // Link previews e.g. Slack, Discord
       ],
     }),
-    // Create a token bucket rate limit. Other algorithms are supported.
+    // Create a sliding window rate limit. Other algorithms are supported.
     slidingWindow({
       mode: 'LIVE', // Blocks requests. Use "DRY_RUN" to log only
       max: 100, // Max 100 requests
