@@ -22,7 +22,7 @@ export const arcjetProtection = async (req, res, next) => {
     }
 
     // check if spoofed bot that bypassed detection
-    if (decision.results.some(isSpoofedBot)) {
+    if (decision.results?.some(isSpoofedBot)) {
       return res.status(403).json({
         error: 'Spoofed bot detected. Access denied.',
         message: 'Malicious bot activity detected.',
@@ -30,7 +30,7 @@ export const arcjetProtection = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    console.log('Arcjet protection error:', error);
+    console.error('Arcjet protection error:', error);
     // Fail open on error to avoid blocking legitimate traffic
     next();
   }
