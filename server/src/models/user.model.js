@@ -1,3 +1,4 @@
+// server/src/models/user.model.js
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
@@ -10,7 +11,7 @@ const userSchema = new mongoose.Schema(
       publicId: { type: String, default: '' },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.model('User', userSchema);
