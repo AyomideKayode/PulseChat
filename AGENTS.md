@@ -26,19 +26,20 @@ npm run dev --prefix client    # Vite dev server on :5173
 - **Email:** Resend (welcome email on signup, non-blocking on failure)
 - **Media:** Cloudinary (profile picture, message images)
 - **Database:** MongoDB via Mongoose
-- **Real-time:** Socket.IO (Phase 2 — not yet wired)
+- **Real-time:** Socket.IO — JWT auth middleware, presence tracking (`Map<userId, Set<socketId>>`), room-based routing (`user:{userId}`)
 
 ## Server Key Files
 
 | Path                      | Purpose                                                                                       |
 | ------------------------- | --------------------------------------------------------------------------------------------- |
-| `server/src/server.ts`    | Entry: Express app, HTTP server, Socket.IO (skeleton), static serve                           |
+| `server/src/server.ts`    | Entry: Express app, HTTP server, Socket.IO, static serve                                      |
 | `server/src/types/`       | TypeScript interfaces: IUser, IMessage, IConversation, socket events                          |
 | `server/src/lib/`         | env, db, utils (generateToken), cloudinary, arcjet, resend                                    |
 | `server/src/models/`      | Mongoose schemas: User, Message (+status field), Conversation                                 |
 | `server/src/middleware/`  | auth (JWT verify), arcjet (rate limit + bot detection)                                        |
 | `server/src/controllers/` | auth (signup/login/logout/updateProfile/checkAuth), message (contacts/messages/conversations) |
 | `server/src/routes/`      | auth, message, conversation routes                                                            |
+| `server/src/socket/`      | Socket.IO auth middleware, presence tracking, event handlers (message, typing, read)          |
 
 ## TypeScript Caveats
 
@@ -47,9 +48,12 @@ npm run dev --prefix client    # Vite dev server on :5173
 - Express `Request` augmented via `src/types/express.d.ts` — `req.user` typed as `IUserDocument`
 - Arcjet runs in `DRY_RUN` mode in development (non-blocking). Set `NODE_ENV=production` to enforce rules.
 
-## Socket.IO Auth
+## Socket.IO
 
-JWT read from `socket.handshake.headers.cookie` at connection time. No client-side token access needed.
+- **Auth:** JWT read from `socket.handshake.headers.cookie` at connection time, attaches user to `socket.data.user`. No client-side token access needed.
+- **Presence:** `Map<userId, Set<socketId>>` — user is online if ≥1 socket active. `user_online`/`user_offline` events broadcast on state transitions only.
+- **Events:** `send_message` (rate-limited 30/10s, validates, persists, upserts Conversation, ack), `typing_start`/`typing_stop` (relayed to receiver), `mark_read` (resets unreadCount, updates message statuses).
+- **Rooms:** Each user joins `user:{userId}` on connect, leaves on disconnect. All targeting uses rooms.
 
 ## Conventions
 
