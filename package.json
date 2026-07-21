@@ -4,8 +4,11 @@
   "description": "A chat application with authentication, realtime messages, online indicators, notification sounds, with image uploads.",
   "main": "index.js",
   "scripts": {
-    "build": "npm install --prefix server && npm install --include=dev --prefix client && npm run build --prefix client",
-    "start": "npm run start --prefix server"
+    "build": "npm run build --prefix server && npm run build --prefix client",
+    "start": "npm run start --prefix server",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -17,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/AyomideKayode/PulseChat/issues"
   },
-  "homepage": "https://github.com/AyomideKayode/PulseChat#readme"
+  "homepage": "https://github.com/AyomideKayode/PulseChat#readme",
+  "devDependencies": {
+    "prettier": "^3.9.5"
+  }
 }

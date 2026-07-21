@@ -1,4 +1,5 @@
-// Cloudinary configuration
+// server/src/lib/cloudinary.ts
+
 import { v2 as cloudinary } from 'cloudinary';
 import { ENV } from './env.js';
 

@@ -1,10 +1,11 @@
+// server/src/lib/resend.ts
+
 import { Resend } from 'resend';
 import { ENV } from './env.js';
 
-// Initialize Resend client
 export const resendClient = new Resend(ENV.RESEND_API_KEY);
 
 export const sender = {
   email: ENV.EMAIL_FROM,
-  name: ENV.EMAIL_FROM_NAME || '💫PulseChat Team',
+  name: ENV.EMAIL_FROM_NAME || 'PulseChat Team',
 };
