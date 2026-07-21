@@ -40,12 +40,12 @@ npm run dev --prefix client    # Vite dev server on :5173
 | `server/src/controllers/` | auth (signup/login/logout/updateProfile/checkAuth), message (contacts/messages/conversations) |
 | `server/src/routes/`      | auth, message, conversation routes                                                            |
 
-## TypeScript Migration Caveats
+## TypeScript Caveats
 
-- `server/` migrated from JS → TS. All `.js` files removed (except `emailTemplates.js` which has no TS equivalent).
-- Use `.js` extension in all relative imports (NodeNext resolution requirement), e.g. `import { x } from './env.js'`
+- All `.ts` files use `.js` extension in relative imports (NodeNext resolution), e.g. `import { x } from './env.js'`
 - Strict mode, no `any`, explicit return types on all functions
 - Express `Request` augmented via `src/types/express.d.ts` — `req.user` typed as `IUserDocument`
+- Arcjet runs in `DRY_RUN` mode in development (non-blocking). Set `NODE_ENV=production` to enforce rules.
 
 ## Socket.IO Auth
 
@@ -58,7 +58,21 @@ JWT read from `socket.handshake.headers.cookie` at connection time. No client-si
 - No linter/formatter configured for server
 - `Record<string, unknown>` for dynamic objects, never `any`
 
+## Commit Convention
+
+Group changes into logical commits following conventional commits:
+
+```bash
+feat(scope): description        # new feature
+fix(scope): description         # bug fix
+chore(deps): description        # dependency changes
+chore(cleanup): description     # file removal
+docs: description               # documentation only
+```
+
+Scope matches the directory/concern (types, lib, models, controllers, middleware, routes, socket). Each commit should compile independently (`npm run build --prefix server` passes).
+
 ## Environment Variables
 
-Required: `MONGODB_URI`, `JWT_SECRET`, `RESEND_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ARCJET_KEY`
+Required: `MONGO_URI`, `JWT_SECRET`, `RESEND_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ARCJET_KEY`
 Optional: `PORT` (default 5000), `CLIENT_URL` (default [http://localhost:5173](http://localhost:5173)), `NODE_ENV` (default development)
