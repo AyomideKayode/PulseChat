@@ -1,4 +1,4 @@
-export function createWelcomeEmailTemplate(name, clientURL) {
+export function createWelcomeEmailTemplate(name: string, clientURL: string): string {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -60,7 +60,7 @@ export function createWelcomeEmailTemplate(name, clientURL) {
       </p>
 
       <p style="color: #E0E0E0;">
-        We’re excited to welcome you to PulseChat — a modern messaging platform built for fast, seamless, real-time conversations.
+        We're excited to welcome you to PulseChat — a modern messaging platform built for fast, seamless, real-time conversations.
       </p>
 
       <!-- Steps -->
@@ -137,5 +137,5 @@ export function createWelcomeEmailTemplate(name, clientURL) {
 
   </body>
   </html>
-  `;
+  `
 }
