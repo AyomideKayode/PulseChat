@@ -53,9 +53,15 @@ JWT read from `socket.handshake.headers.cookie` at connection time. No client-si
 
 ## Conventions
 
-- **Prettier** for all files — configured in `.prettierrc` (no semicolons, single quotes, trailing commas). Run `npx prettier --write .` before committing.
+- **Prettier** for all files — configured in `.prettierrc` (semicolons: true, single quotes, trailing commas). Run `npx prettier --write .` before committing.
 - ESLint in client (`eslint.config.js`)
 - `Record<string, unknown>` for dynamic objects, never `any`
+
+## Workflow
+
+- Agent stages changes but does **not** commit until you explicitly say so.
+- When you give the commit signal, agent groups changes into logical commits following the convention below.
+- Agent should push back with reasoning when it has a better-informed opinion, not blindly follow suggestions.
 
 ## Commit Convention
 
