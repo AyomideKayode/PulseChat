@@ -9,7 +9,9 @@ import Conversation from '../models/conversation.model.js';
 export const getAllContacts = async (req: Request, res: Response): Promise<void> => {
   try {
     const loggedInUserId = req.user!._id;
-    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select('-password');
+    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select(
+      'fullName email profilePicture',
+    );
 
     res.status(200).json(filteredUsers);
   } catch (error) {
