@@ -53,9 +53,8 @@ JWT read from `socket.handshake.headers.cookie` at connection time. No client-si
 
 ## Conventions
 
-- No semicolons in JS/TS source
+- **Prettier** for all files — configured in `.prettierrc` (no semicolons, single quotes, trailing commas). Run `npx prettier --write .` before committing.
 - ESLint in client (`eslint.config.js`)
-- No linter/formatter configured for server
 - `Record<string, unknown>` for dynamic objects, never `any`
 
 ## Commit Convention

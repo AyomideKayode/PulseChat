@@ -7,7 +7,8 @@
     "build": "npm run build --prefix server && npm run build --prefix client",
     "start": "npm run start --prefix server",
     "dev:server": "npm run dev --prefix server",
-    "dev:client": "npm run dev --prefix client"
+    "dev:client": "npm run dev --prefix client",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
