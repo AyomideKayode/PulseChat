@@ -1,27 +1,27 @@
 // server/src/types/user.types.ts
 
-import { Document, Types } from 'mongoose'
+import { Document, Types } from 'mongoose';
 
 export interface IUser {
-  _id: Types.ObjectId
-  fullName: string
-  email: string
-  password: string
+  _id: Types.ObjectId;
+  fullName: string;
+  email: string;
+  password: string;
   profilePicture: {
-    url: string
-    publicId: string
-  }
-  createdAt: Date
-  updatedAt: Date
+    url: string;
+    publicId: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IUserDocument extends IUser, Document {}
 
 export interface IUserResponse {
-  _id: Types.ObjectId
-  fullName: string
-  email: string
-  profilePicture: { url: string; publicId: string }
+  _id: Types.ObjectId;
+  fullName: string;
+  email: string;
+  profilePicture: { url: string; publicId: string };
 }
 
 export function toUserResponse(user: IUserDocument): IUserResponse {
@@ -30,5 +30,5 @@ export function toUserResponse(user: IUserDocument): IUserResponse {
     fullName: user.fullName,
     email: user.email,
     profilePicture: user.profilePicture,
-  }
+  };
 }

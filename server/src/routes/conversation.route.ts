@@ -1,11 +1,11 @@
 // server/src/routes/conversation.route.ts
 
-import { Router } from 'express'
-import { getConversations } from '../controllers/message.controller.js'
-import { protectRoute } from '../middleware/auth.middleware.js'
+import { Router } from 'express';
+import { getConversations } from '../controllers/message.controller.js';
+import { protectRoute } from '../middleware/auth.middleware.js';
 
-const router = Router()
+const router = Router();
 
-router.get('/', protectRoute, getConversations)
+router.get('/', protectRoute, getConversations);
 
-export default router
+export default router;

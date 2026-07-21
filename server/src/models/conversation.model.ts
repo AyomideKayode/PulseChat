@@ -1,7 +1,7 @@
 //  server/src/models/conversation.model.ts
 
-import mongoose, { Schema } from 'mongoose'
-import { IConversationDocument } from '../types/conversation.types.js'
+import mongoose, { Schema } from 'mongoose';
+import { IConversationDocument } from '../types/conversation.types.js';
 
 const conversationSchema = new Schema<IConversationDocument>(
   {
@@ -26,9 +26,9 @@ const conversationSchema = new Schema<IConversationDocument>(
     },
   },
   { timestamps: true },
-)
+);
 
-conversationSchema.index({ participants: 1 })
+conversationSchema.index({ participants: 1 });
 
-const Conversation = mongoose.model<IConversationDocument>('Conversation', conversationSchema)
-export default Conversation
+const Conversation = mongoose.model<IConversationDocument>('Conversation', conversationSchema);
+export default Conversation;

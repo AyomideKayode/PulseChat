@@ -1,11 +1,11 @@
-import arcjet, { shield, detectBot, slidingWindow } from '@arcjet/node'
-import { ENV } from './env.js'
+import arcjet, { shield, detectBot, slidingWindow } from '@arcjet/node';
+import { ENV } from './env.js';
 
 if (!ENV.ARCJET_KEY) {
-  throw new Error('Missing required environment variable: ARCJET_KEY')
+  throw new Error('Missing required environment variable: ARCJET_KEY');
 }
 
-const mode = ENV.NODE_ENV === 'production' ? 'LIVE' : 'DRY_RUN'
+const mode = ENV.NODE_ENV === 'production' ? 'LIVE' : 'DRY_RUN';
 
 const aj = arcjet({
   key: ENV.ARCJET_KEY,
@@ -21,6 +21,6 @@ const aj = arcjet({
       interval: 60,
     }),
   ],
-})
+});
 
-export default aj
+export default aj;

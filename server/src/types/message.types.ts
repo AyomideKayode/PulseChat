@@ -1,6 +1,6 @@
 // server/src/types/message.types.ts
 
-import { Document, Types } from 'mongoose'
+import { Document, Types } from 'mongoose';
 
 export enum MessageStatus {
   Sent = 'sent',
@@ -9,19 +9,19 @@ export enum MessageStatus {
 }
 
 export interface IMessage {
-  senderId: Types.ObjectId
-  receiverId: Types.ObjectId
-  text?: string
-  image?: string
-  status: MessageStatus
-  createdAt: Date
-  updatedAt: Date
+  senderId: Types.ObjectId;
+  receiverId: Types.ObjectId;
+  text?: string;
+  image?: string;
+  status: MessageStatus;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IMessageDocument extends IMessage, Document {}
 
 export interface SendMessagePayload {
-  receiverId: string
-  text?: string
-  image?: string
+  receiverId: string;
+  text?: string;
+  image?: string;
 }

@@ -137,5 +137,5 @@ export function createWelcomeEmailTemplate(name: string, clientURL: string): str
 
   </body>
   </html>
-  `
+  `;
 }
