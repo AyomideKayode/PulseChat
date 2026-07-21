@@ -194,28 +194,28 @@ Expected: No output (success). Then remove `_placeholder.ts`.
 - [ ] **Step 1: Create user.types.ts**
 
 ```typescript
-import { Document, Types } from 'mongoose';
+import { Document, Types } from 'mongoose'
 
 export interface IUser {
-  _id: Types.ObjectId;
-  fullName: string;
-  email: string;
-  password: string;
+  _id: Types.ObjectId
+  fullName: string
+  email: string
+  password: string
   profilePicture: {
-    url: string;
-    publicId: string;
-  };
-  createdAt: Date;
-  updatedAt: Date;
+    url: string
+    publicId: string
+  }
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface IUserDocument extends IUser, Document {}
 
 export interface IUserResponse {
-  _id: Types.ObjectId;
-  fullName: string;
-  email: string;
-  profilePicture: { url: string; publicId: string };
+  _id: Types.ObjectId
+  fullName: string
+  email: string
+  profilePicture: { url: string; publicId: string }
 }
 
 export function toUserResponse(user: IUserDocument): IUserResponse {
@@ -224,14 +224,14 @@ export function toUserResponse(user: IUserDocument): IUserResponse {
     fullName: user.fullName,
     email: user.email,
     profilePicture: user.profilePicture,
-  };
+  }
 }
 ```
 
 - [ ] **Step 2: Create message.types.ts**
 
 ```typescript
-import { Document, Types } from 'mongoose';
+import { Document, Types } from 'mongoose'
 
 export enum MessageStatus {
   Sent = 'sent',
@@ -240,39 +240,39 @@ export enum MessageStatus {
 }
 
 export interface IMessage {
-  senderId: Types.ObjectId;
-  receiverId: Types.ObjectId;
-  text?: string;
-  image?: string;
-  status: MessageStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  senderId: Types.ObjectId
+  receiverId: Types.ObjectId
+  text?: string
+  image?: string
+  status: MessageStatus
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface IMessageDocument extends IMessage, Document {}
 
 export interface SendMessagePayload {
-  receiverId: string;
-  text?: string;
-  image?: string;
+  receiverId: string
+  text?: string
+  image?: string
 }
 ```
 
 - [ ] **Step 3: Create conversation.types.ts**
 
 ```typescript
-import { Document, Types } from 'mongoose';
+import { Document, Types } from 'mongoose'
 
 export interface IConversation {
-  participants: [Types.ObjectId, Types.ObjectId];
+  participants: [Types.ObjectId, Types.ObjectId]
   lastMessage?: {
-    text: string;
-    senderId: Types.ObjectId;
-    createdAt: Date;
-  };
-  unreadCount: Map<string, number>;
-  createdAt: Date;
-  updatedAt: Date;
+    text: string
+    senderId: Types.ObjectId
+    createdAt: Date
+  }
+  unreadCount: Map<string, number>
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface IConversationDocument extends IConversation, Document {}
@@ -281,48 +281,44 @@ export interface IConversationDocument extends IConversation, Document {}
 - [ ] **Step 4: Create socket-events.types.ts**
 
 ```typescript
-import { IMessage } from './message.types.js';
+import { IMessage } from './message.types.js'
 
 export interface ServerToClientEvents {
-  new_message: (message: IMessage) => void;
-  user_online: (data: { userId: string }) => void;
-  user_offline: (data: { userId: string }) => void;
-  typing_start: (data: { userId: string }) => void;
-  typing_stop: (data: { userId: string }) => void;
-  error: (data: { message: string }) => void;
+  new_message: (message: IMessage) => void
+  user_online: (data: { userId: string }) => void
+  user_offline: (data: { userId: string }) => void
+  typing_start: (data: { userId: string }) => void
+  typing_stop: (data: { userId: string }) => void
+  error: (data: { message: string }) => void
 }
 
 export interface ClientToServerEvents {
   send_message: (
     data: { receiverId: string; text?: string; image?: string },
-    ack: (response: {
-      success: boolean;
-      message?: IMessage;
-      error?: string;
-    }) => void,
-  ) => void;
+    ack: (response: { success: boolean; message?: IMessage; error?: string }) => void,
+  ) => void
   mark_read: (
     data: { conversationId: string },
     ack: (response: { success: boolean }) => void,
-  ) => void;
-  typing_start: (data: { receiverId: string }) => void;
-  typing_stop: (data: { receiverId: string }) => void;
+  ) => void
+  typing_start: (data: { receiverId: string }) => void
+  typing_stop: (data: { receiverId: string }) => void
 }
 
 export interface InterServerEvents {
-  ping: () => void;
+  ping: () => void
 }
 ```
 
 - [ ] **Step 5: Create express.d.ts**
 
 ```typescript
-import { IUserDocument } from './user.types.js';
+import { IUserDocument } from './user.types.js'
 
 declare global {
   namespace Express {
     interface Request {
-      user?: IUserDocument;
+      user?: IUserDocument
     }
   }
 }
@@ -344,15 +340,15 @@ declare global {
 Read the existing `src/lib/env.js`, then rewrite as typed:
 
 ```typescript
-import dotenv from 'dotenv';
-dotenv.config();
+import dotenv from 'dotenv'
+dotenv.config()
 
 function requireEnv(key: string): string {
-  const value = process.env[key];
+  const value = process.env[key]
   if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
+    throw new Error(`Missing required environment variable: ${key}`)
   }
-  return value;
+  return value
 }
 
 export const ENV = {
@@ -366,7 +362,7 @@ export const ENV = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   ARCJET_KEY: process.env.ARCJET_KEY,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
-} as const;
+} as const
 ```
 
 - [ ] **Step 2: Migrate db.ts**
@@ -374,16 +370,16 @@ export const ENV = {
 Read existing `src/lib/db.js`, convert to TS:
 
 ```typescript
-import mongoose from 'mongoose';
-import { ENV } from './env.js';
+import mongoose from 'mongoose'
+import { ENV } from './env.js'
 
 export async function connectDB(): Promise<void> {
   try {
-    const conn = await mongoose.connect(ENV.MONGODB_URI);
-    console.log(`MongoDB connected: ${conn.connection.host}`);
+    const conn = await mongoose.connect(ENV.MONGODB_URI)
+    console.log(`MongoDB connected: ${conn.connection.host}`)
   } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
+    console.error('MongoDB connection error:', error)
+    process.exit(1)
   }
 }
 ```
@@ -393,22 +389,22 @@ export async function connectDB(): Promise<void> {
 Read existing `src/lib/utils.js`. It should have `generateToken`:
 
 ```typescript
-import jwt from 'jsonwebtoken';
-import { Response } from 'express';
-import { Types } from 'mongoose';
-import { ENV } from './env.js';
+import jwt from 'jsonwebtoken'
+import { Response } from 'express'
+import { Types } from 'mongoose'
+import { ENV } from './env.js'
 
 export function generateToken(userId: Types.ObjectId, res: Response): void {
   const token = jwt.sign({ userId: userId.toString() }, ENV.JWT_SECRET, {
     expiresIn: '7d',
-  });
+  })
 
   res.cookie('jwt', token, {
     httpOnly: true,
     secure: ENV.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+  })
 }
 ```
 
@@ -438,8 +434,8 @@ Expected: No errors.
 Read existing `user.model.js`, convert to TS using typed schema:
 
 ```typescript
-import mongoose, { Schema } from 'mongoose';
-import { IUserDocument } from '../types/user.types.js';
+import mongoose, { Schema } from 'mongoose'
+import { IUserDocument } from '../types/user.types.js'
 
 const userSchema = new Schema<IUserDocument>(
   {
@@ -452,10 +448,10 @@ const userSchema = new Schema<IUserDocument>(
     },
   },
   { timestamps: true },
-);
+)
 
-const User = mongoose.model<IUserDocument>('User', userSchema);
-export default User;
+const User = mongoose.model<IUserDocument>('User', userSchema)
+export default User
 ```
 
 - [ ] **Step 2: Create message.model.ts**
@@ -463,8 +459,8 @@ export default User;
 Read existing `message.model.js`, add `status` field:
 
 ```typescript
-import mongoose, { Schema } from 'mongoose';
-import { IMessageDocument, MessageStatus } from '../types/message.types.js';
+import mongoose, { Schema } from 'mongoose'
+import { IMessageDocument, MessageStatus } from '../types/message.types.js'
 
 const messageSchema = new Schema<IMessageDocument>(
   {
@@ -491,19 +487,19 @@ const messageSchema = new Schema<IMessageDocument>(
     },
   },
   { timestamps: true },
-);
+)
 
-messageSchema.index({ senderId: 1, receiverId: 1, createdAt: -1 });
+messageSchema.index({ senderId: 1, receiverId: 1, createdAt: -1 })
 
-const Message = mongoose.model<IMessageDocument>('Message', messageSchema);
-export default Message;
+const Message = mongoose.model<IMessageDocument>('Message', messageSchema)
+export default Message
 ```
 
 - [ ] **Step 3: Create conversation.model.ts**
 
 ```typescript
-import mongoose, { Schema } from 'mongoose';
-import { IConversationDocument } from '../types/conversation.types.js';
+import mongoose, { Schema } from 'mongoose'
+import { IConversationDocument } from '../types/conversation.types.js'
 
 const conversationSchema = new Schema<IConversationDocument>(
   {
@@ -528,7 +524,7 @@ const conversationSchema = new Schema<IConversationDocument>(
     },
   },
   { timestamps: true },
-);
+)
 
 conversationSchema.index(
   { participants: 1 },
@@ -537,13 +533,10 @@ conversationSchema.index(
     // Ensure [A,B] and [B,A] are treated as the same conversation
     // This is enforced at query time, not index time
   },
-);
+)
 
-const Conversation = mongoose.model<IConversationDocument>(
-  'Conversation',
-  conversationSchema,
-);
-export default Conversation;
+const Conversation = mongoose.model<IConversationDocument>('Conversation', conversationSchema)
+export default Conversation
 ```
 
 - [ ] **Step 4: Verify models compile**
@@ -567,13 +560,13 @@ Expected: No errors.
 Read existing `auth.middleware.js`. Convert to TS:
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.model.js';
-import { ENV } from '../lib/env.js';
+import { Request, Response, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
+import User from '../models/user.model.js'
+import { ENV } from '../lib/env.js'
 
 interface JwtPayload {
-  userId: string;
+  userId: string
 }
 
 export const protectRoute = async (
@@ -582,28 +575,28 @@ export const protectRoute = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const token = req.cookies?.jwt;
+    const token = req.cookies?.jwt
 
     if (!token) {
-      res.status(401).json({ message: 'Unauthorized - No token provided' });
-      return;
+      res.status(401).json({ message: 'Unauthorized - No token provided' })
+      return
     }
 
-    const decoded = jwt.verify(token, ENV.JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, ENV.JWT_SECRET) as JwtPayload
 
-    const user = await User.findById(decoded.userId).select('-password');
+    const user = await User.findById(decoded.userId).select('-password')
     if (!user) {
-      res.status(401).json({ message: 'Unauthorized - User not found' });
-      return;
+      res.status(401).json({ message: 'Unauthorized - User not found' })
+      return
     }
 
-    req.user = user;
-    next();
+    req.user = user
+    next()
   } catch (error) {
-    console.error('Auth middleware error:', error);
-    res.status(401).json({ message: 'Unauthorized - Token error' });
+    console.error('Auth middleware error:', error)
+    res.status(401).json({ message: 'Unauthorized - Token error' })
   }
-};
+}
 ```
 
 - [ ] **Step 2: Create arcjet.middleware.ts**
@@ -611,9 +604,9 @@ export const protectRoute = async (
 Read existing `arcjet.middleware.js`. Convert to TS:
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
-import aj from '../lib/arcjet.js';
-import { isSpoofedBot } from '@arcjet/inspect';
+import { Request, Response, NextFunction } from 'express'
+import aj from '../lib/arcjet.js'
+import { isSpoofedBot } from '@arcjet/inspect'
 
 export const arcjetProtection = async (
   req: Request,
@@ -621,37 +614,35 @@ export const arcjetProtection = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const decision = await aj.protect(req);
+    const decision = await aj.protect(req)
 
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
-        res
-          .status(429)
-          .json({ message: 'Rate Limit exceeded. Please try again later.' });
-        return;
+        res.status(429).json({ message: 'Rate Limit exceeded. Please try again later.' })
+        return
       }
       if (decision.reason.isBot()) {
-        res.status(403).json({ message: 'Bot detected. Access denied.' });
-        return;
+        res.status(403).json({ message: 'Bot detected. Access denied.' })
+        return
       }
-      res.status(403).json({ message: 'Access denied by security rules.' });
-      return;
+      res.status(403).json({ message: 'Access denied by security rules.' })
+      return
     }
 
     if (decision.results?.some(isSpoofedBot)) {
       res.status(403).json({
         error: 'Spoofed bot detected. Access denied.',
         message: 'Malicious bot activity detected.',
-      });
-      return;
+      })
+      return
     }
 
-    next();
+    next()
   } catch (error) {
-    console.error('Arcjet protection error:', error);
-    next();
+    console.error('Arcjet protection error:', error)
+    next()
   }
-};
+}
 ```
 
 - [ ] **Step 3: Verify middleware compiles**
@@ -681,170 +672,157 @@ Key changes from JS version:
 - Use `toUserResponse()` for responses
 
 ```typescript
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import { sendWelcomeEmail } from '../emails/emailHandlers.js';
-import { generateToken } from '../lib/utils.js';
-import { ENV } from '../lib/env.js';
-import cloudinary from '../lib/cloudinary.js';
-import User from '../models/user.model.js';
-import { toUserResponse } from '../types/user.types.js';
+import { Request, Response } from 'express'
+import bcrypt from 'bcryptjs'
+import { sendWelcomeEmail } from '../emails/emailHandlers.js'
+import { generateToken } from '../lib/utils.js'
+import { ENV } from '../lib/env.js'
+import cloudinary from '../lib/cloudinary.js'
+import User from '../models/user.model.js'
+import { toUserResponse } from '../types/user.types.js'
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password } = req.body as {
-    fullName?: string;
-    email?: string;
-    password?: string;
-  };
+    fullName?: string
+    email?: string
+    password?: string
+  }
 
   try {
     if (!fullName || !email || !password) {
-      res.status(400).json({ message: 'All fields are required.' });
-      return;
+      res.status(400).json({ message: 'All fields are required.' })
+      return
     }
 
     if (password.length < 8) {
-      res
-        .status(400)
-        .json({ message: 'Password must be at least 8 characters long.' });
-      return;
+      res.status(400).json({ message: 'Password must be at least 8 characters long.' })
+      return
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      res.status(400).json({ message: 'Invalid email format.' });
-      return;
+      res.status(400).json({ message: 'Invalid email format.' })
+      return
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email })
     if (existingUser) {
-      res
-        .status(400)
-        .json({ message: 'Unable to create account with provided details.' });
-      return;
+      res.status(400).json({ message: 'Unable to create account with provided details.' })
+      return
     }
 
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt(12)
+    const hashedPassword = await bcrypt.hash(password, salt)
 
-    const newUser = new User({ fullName, email, password: hashedPassword });
-    const savedUser = await newUser.save();
-    generateToken(savedUser._id, res);
+    const newUser = new User({ fullName, email, password: hashedPassword })
+    const savedUser = await newUser.save()
+    generateToken(savedUser._id, res)
 
     try {
-      await sendWelcomeEmail(
-        savedUser.email,
-        savedUser.fullName,
-        ENV.CLIENT_URL,
-      );
+      await sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL)
     } catch (error) {
-      console.error('Failed to send welcome email (non-blocking):', error);
+      console.error('Failed to send welcome email (non-blocking):', error)
     }
 
-    res.status(201).json(toUserResponse(savedUser));
+    res.status(201).json(toUserResponse(savedUser))
   } catch (error) {
-    console.error('Error during signup:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+    console.error('Error during signup:', error)
+    res.status(500).json({ message: 'Internal server error.' })
   }
-};
+}
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body as { email?: string; password?: string };
+  const { email, password } = req.body as { email?: string; password?: string }
 
   try {
     if (!email || !password) {
-      res.status(400).json({ message: 'All fields are required.' });
-      return;
+      res.status(400).json({ message: 'All fields are required.' })
+      return
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
     if (!user) {
-      res.status(400).json({ message: 'Invalid credentials provided.' });
-      return;
+      res.status(400).json({ message: 'Invalid credentials provided.' })
+      return
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-      res.status(400).json({ message: 'Invalid credentials provided.' });
-      return;
+      res.status(400).json({ message: 'Invalid credentials provided.' })
+      return
     }
 
-    generateToken(user._id, res);
-    res.status(200).json(toUserResponse(user));
+    generateToken(user._id, res)
+    res.status(200).json(toUserResponse(user))
   } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+    console.error('Error during login:', error)
+    res.status(500).json({ message: 'Internal server error.' })
   }
-};
+}
 
 export const logout = (_req: Request, res: Response): void => {
-  res.cookie('jwt', '', { maxAge: 0 });
-  res.status(200).json({ message: 'Logged out successfully.' });
-};
+  res.cookie('jwt', '', { maxAge: 0 })
+  res.status(200).json({ message: 'Logged out successfully.' })
+}
 
-export const updateProfile = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fullName, profilePicture } = req.body as {
-      fullName?: string;
-      profilePicture?: string;
-    };
-    const userId = req.user!._id;
+      fullName?: string
+      profilePicture?: string
+    }
+    const userId = req.user!._id
 
     if (!fullName && !profilePicture) {
-      res.status(400).json({ message: 'At least one field is required' });
-      return;
+      res.status(400).json({ message: 'At least one field is required' })
+      return
     }
 
-    const updatedData: Record<string, unknown> = {};
-    if (fullName) updatedData.fullName = fullName;
+    const updatedData: Record<string, unknown> = {}
+    if (fullName) updatedData.fullName = fullName
 
     if (profilePicture) {
-      const currentUser = await User.findById(userId);
+      const currentUser = await User.findById(userId)
       if (!currentUser) {
-        res.status(404).json({ message: 'User not found.' });
-        return;
+        res.status(404).json({ message: 'User not found.' })
+        return
       }
 
       if (currentUser.profilePicture?.publicId) {
         try {
-          await cloudinary.uploader.destroy(
-            currentUser.profilePicture.publicId,
-          );
+          await cloudinary.uploader.destroy(currentUser.profilePicture.publicId)
         } catch (destroyError) {
-          console.error('Failed to delete old profile picture:', destroyError);
+          console.error('Failed to delete old profile picture:', destroyError)
         }
       }
 
-      const uploadResponse = await cloudinary.uploader.upload(profilePicture);
+      const uploadResponse = await cloudinary.uploader.upload(profilePicture)
       updatedData.profilePicture = {
         url: uploadResponse.secure_url,
         publicId: uploadResponse.public_id,
-      };
+      }
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updatedData },
       { new: true },
-    ).select('-password');
+    ).select('-password')
     if (!updatedUser) {
-      res.status(404).json({ message: 'User not found.' });
-      return;
+      res.status(404).json({ message: 'User not found.' })
+      return
     }
 
-    res.status(200).json(toUserResponse(updatedUser));
+    res.status(200).json(toUserResponse(updatedUser))
   } catch (error) {
-    console.error('Error updating profile:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+    console.error('Error updating profile:', error)
+    res.status(500).json({ message: 'Internal server error.' })
   }
-};
+}
 
 export const checkAuth = async (req: Request, res: Response): Promise<void> => {
-  res.status(200).json(toUserResponse(req.user!));
-};
+  res.status(200).json(toUserResponse(req.user!))
+}
 ```
 
 - [ ] **Step 2: Create message.controller.ts**
@@ -852,89 +830,80 @@ export const checkAuth = async (req: Request, res: Response): Promise<void> => {
 Read existing `message.controller.js`. Convert to TS and expand with new endpoints:
 
 ```typescript
-import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import Message from '../models/message.model.js';
-import User from '../models/user.model.js';
-import Conversation from '../models/conversation.model.js';
+import { Request, Response } from 'express'
+import mongoose from 'mongoose'
+import Message from '../models/message.model.js'
+import User from '../models/user.model.js'
+import Conversation from '../models/conversation.model.js'
 
-export const getAllContacts = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getAllContacts = async (req: Request, res: Response): Promise<void> => {
   try {
-    const loggedInUserId = req.user!._id;
+    const loggedInUserId = req.user!._id
     const filteredUsers = await User.find(
       { _id: { $ne: loggedInUserId } },
       'fullName email profilePicture',
-    ).select('-password');
+    ).select('-password')
 
-    res.status(200).json(filteredUsers);
+    res.status(200).json(filteredUsers)
   } catch (error) {
-    console.error('Error fetching contacts:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching contacts:', error)
+    res.status(500).json({ message: 'Server error' })
   }
-};
+}
 
-export const getMessages = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getMessages = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
-    const loggedInUserId = req.user!._id;
+    const { userId } = req.params
+    const loggedInUserId = req.user!._id
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      res.status(400).json({ message: 'Invalid user ID' });
-      return;
+      res.status(400).json({ message: 'Invalid user ID' })
+      return
     }
 
-    const { before } = req.query as { before?: string };
-    const limit = 50;
+    const { before } = req.query as { before?: string }
+    const limit = 50
 
     const filter: Record<string, unknown> = {
       $or: [
         { senderId: loggedInUserId, receiverId: userId },
         { senderId: userId, receiverId: loggedInUserId },
       ],
-    };
+    }
 
     if (before && mongoose.Types.ObjectId.isValid(before)) {
-      filter._id = { $lt: new mongoose.Types.ObjectId(before) };
+      filter._id = { $lt: new mongoose.Types.ObjectId(before) }
     }
 
     const messages = await Message.find(filter)
       .sort({ createdAt: -1 })
       .limit(limit)
       .populate('senderId', 'fullName email profilePicture')
-      .populate('receiverId', 'fullName email profilePicture');
+      .populate('receiverId', 'fullName email profilePicture')
 
-    res.status(200).json(messages.reverse());
+    res.status(200).json(messages.reverse())
   } catch (error) {
-    console.error('Error fetching messages:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching messages:', error)
+    res.status(500).json({ message: 'Server error' })
   }
-};
+}
 
-export const getConversations = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getConversations = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user!._id;
+    const userId = req.user!._id
 
     const conversations = await Conversation.find({
       participants: userId,
     })
       .sort({ 'lastMessage.createdAt': -1 })
-      .populate('participants', 'fullName email profilePicture');
+      .populate('participants', 'fullName email profilePicture')
 
-    res.status(200).json(conversations);
+    res.status(200).json(conversations)
   } catch (error) {
-    console.error('Error fetching conversations:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching conversations:', error)
+    res.status(500).json({ message: 'Server error' })
   }
-};
+}
 ```
 
 - [ ] **Step 3: Verify controllers compile**
@@ -958,89 +927,83 @@ Expected: No errors.
 - [ ] **Step 1: Create auth.route.ts**
 
 ```typescript
-import { Router } from 'express';
-import {
-  signup,
-  login,
-  logout,
-  updateProfile,
-  checkAuth,
-} from '../controllers/auth.controller.js';
-import { protectRoute } from '../middleware/auth.middleware.js';
-import { arcjetProtection } from '../middleware/arcjet.middleware.js';
+import { Router } from 'express'
+import { signup, login, logout, updateProfile, checkAuth } from '../controllers/auth.controller.js'
+import { protectRoute } from '../middleware/auth.middleware.js'
+import { arcjetProtection } from '../middleware/arcjet.middleware.js'
 
-const router = Router();
+const router = Router()
 
-router.use(arcjetProtection);
+router.use(arcjetProtection)
 
-router.post('/signup', signup);
-router.post('/login', login);
-router.post('/logout', logout);
-router.put('/update-profile', protectRoute, updateProfile);
-router.get('/check', protectRoute, checkAuth);
+router.post('/signup', signup)
+router.post('/login', login)
+router.post('/logout', logout)
+router.put('/update-profile', protectRoute, updateProfile)
+router.get('/check', protectRoute, checkAuth)
 
-export default router;
+export default router
 ```
 
 - [ ] **Step 2: Create message.route.ts**
 
 ```typescript
-import { Router } from 'express';
-import { getAllContacts } from '../controllers/message.controller.js';
-import { protectRoute } from '../middleware/auth.middleware.js';
+import { Router } from 'express'
+import { getAllContacts } from '../controllers/message.controller.js'
+import { protectRoute } from '../middleware/auth.middleware.js'
 
-const router = Router();
+const router = Router()
 
-router.get('/contacts', protectRoute, getAllContacts);
+router.get('/contacts', protectRoute, getAllContacts)
 
-export default router;
+export default router
 ```
 
 - [ ] **Step 3: Create conversation.route.ts**
 
 ```typescript
-import { Router } from 'express';
-import { getConversations } from '../controllers/message.controller.js';
-import { protectRoute } from '../middleware/auth.middleware.js';
+import { Router } from 'express'
+import { getConversations } from '../controllers/message.controller.js'
+import { protectRoute } from '../middleware/auth.middleware.js'
 
-const router = Router();
+const router = Router()
 
-router.get('/', protectRoute, getConversations);
+router.get('/', protectRoute, getConversations)
 
-export default router;
+export default router
 ```
 
 - [ ] **Step 4: Create server.ts**
 
 ```typescript
-import express from 'express';
-import { createServer } from 'http';
-import cookieParser from 'cookie-parser';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Server } from 'socket.io';
+import express from 'express'
+import { createServer } from 'http'
+import cookieParser from 'cookie-parser'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { Server } from 'socket.io'
 
-import authRoutes from './routes/auth.route.js';
-import messageRoutes from './routes/message.route.js';
-import conversationRoutes from './routes/conversation.route.js';
-import { connectDB } from './lib/db.js';
-import { ENV } from './lib/env.js';
+import authRoutes from './routes/auth.route.js'
+import messageRoutes from './routes/message.route.js'
+import conversationRoutes from './routes/conversation.route.js'
+import { connectDB } from './lib/db.js'
+import { ENV } from './lib/env.js'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-const app = express();
-const httpServer = createServer(app);
+const app = express()
+const httpServer = createServer(app)
 
-const PORT = ENV.PORT || 5000;
+const PORT = ENV.PORT || 5000
 
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ limit: '5mb', extended: true }));
-app.use(cookieParser());
+app.use(express.json({ limit: '5mb' }))
+app.use(express.urlencoded({ limit: '5mb', extended: true }))
+app.use(cookieParser())
 
-app.use('/api/auth', authRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/conversations', conversationRoutes);
+app.use('/api/auth', authRoutes)
+app.use('/api/messages', messageRoutes)
+app.use('/api/conversations', conversationRoutes)
 
 // Socket.IO (wired in Phase 2)
 const io = new Server(httpServer, {
@@ -1048,31 +1011,31 @@ const io = new Server(httpServer, {
     origin: ENV.CLIENT_URL,
     credentials: true,
   },
-});
+})
 
 // TODO: Phase 2 — wire Socket.IO auth middleware and event handlers
 
 // Serve static frontend in production
 if (ENV.NODE_ENV === 'production') {
-  const clientDist = path.join(__dirname, '../../client/dist');
-  app.use(express.static(clientDist));
+  const clientDist = path.join(__dirname, '../../client/dist')
+  app.use(express.static(clientDist))
   app.get('*', (_req, res) => {
-    res.sendFile(path.join(clientDist, 'index.html'));
-  });
+    res.sendFile(path.join(clientDist, 'index.html'))
+  })
 } else {
   app.get('/', (_req, res) => {
-    res.send('PulseChat API is running in development mode.');
-  });
+    res.send('PulseChat API is running in development mode.')
+  })
 }
 
 try {
-  await connectDB();
+  await connectDB()
   httpServer.listen(PORT, () => {
-    console.log(`PulseChat running on port ${PORT}`);
-  });
+    console.log(`PulseChat running on port ${PORT}`)
+  })
 } catch (error) {
-  console.error('Failed to start PulseChat:', error);
-  process.exit(1);
+  console.error('Failed to start PulseChat:', error)
+  process.exit(1)
 }
 ```
 

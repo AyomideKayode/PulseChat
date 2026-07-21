@@ -1,14 +1,14 @@
 // server/src/lib/env.ts
 
-import dotenv from 'dotenv';
-dotenv.config();
+import dotenv from 'dotenv'
+dotenv.config()
 
 function requireEnv(key: string): string {
-  const value = process.env[key];
+  const value = process.env[key]
   if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
+    throw new Error(`Missing required environment variable: ${key}`)
   }
-  return value;
+  return value
 }
 
 export const ENV = {
@@ -25,4 +25,4 @@ export const ENV = {
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM,
   EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME,
-} as const;
+} as const

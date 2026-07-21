@@ -13,10 +13,7 @@ const aj = arcjet({
     shield({ mode }),
     detectBot({
       mode,
-      allow: [
-        'CATEGORY:SEARCH_ENGINE',
-        'CATEGORY:MONITOR',
-      ],
+      allow: ['CATEGORY:SEARCH_ENGINE', 'CATEGORY:MONITOR'],
     }),
     slidingWindow({
       mode,

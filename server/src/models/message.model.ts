@@ -1,7 +1,7 @@
 // server/src/models/message.model.ts
 
-import mongoose, { Schema } from 'mongoose';
-import { IMessageDocument, MessageStatus } from '../types/message.types.js';
+import mongoose, { Schema } from 'mongoose'
+import { IMessageDocument, MessageStatus } from '../types/message.types.js'
 
 const messageSchema = new Schema<IMessageDocument>(
   {
@@ -28,9 +28,9 @@ const messageSchema = new Schema<IMessageDocument>(
     },
   },
   { timestamps: true },
-);
+)
 
-messageSchema.index({ senderId: 1, receiverId: 1, createdAt: -1 });
+messageSchema.index({ senderId: 1, receiverId: 1, createdAt: -1 })
 
-const Message = mongoose.model<IMessageDocument>('Message', messageSchema);
-export default Message;
+const Message = mongoose.model<IMessageDocument>('Message', messageSchema)
+export default Message
