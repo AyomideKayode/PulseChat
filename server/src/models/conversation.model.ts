@@ -28,10 +28,7 @@ const conversationSchema = new Schema<IConversationDocument>(
   { timestamps: true },
 )
 
-conversationSchema.index(
-  { participants: 1 },
-  { unique: true },
-)
+conversationSchema.index({ participants: 1 })
 
 const Conversation = mongoose.model<IConversationDocument>('Conversation', conversationSchema)
 export default Conversation
