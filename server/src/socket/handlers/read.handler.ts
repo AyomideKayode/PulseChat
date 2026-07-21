@@ -27,17 +27,22 @@ export async function handleMarkRead(
 
     const userId = user._id.toString();
 
-    // Reset unreadCount for this user
-    await Conversation.findByIdAndUpdate(conversationId, {
-      $set: { [`unreadCount.${userId}`]: 0 },
-    });
-
-    // Find the other participant to update message statuses
+    // Fetch conversation and verify caller is a participant
     const conversation = await Conversation.findById(conversationId);
     if (!conversation) {
       ack({ success: false });
       return;
     }
+
+    if (!conversation.participants.some((p) => p.toString() === userId)) {
+      ack({ success: false });
+      return;
+    }
+
+    // Reset unreadCount for this user
+    await Conversation.findByIdAndUpdate(conversationId, {
+      $set: { [`unreadCount.${userId}`]: 0 },
+    });
 
     const otherParticipant = conversation.participants.find((p) => p.toString() !== userId);
     if (otherParticipant) {

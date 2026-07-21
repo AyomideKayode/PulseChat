@@ -126,8 +126,8 @@ Closes #<if applicable>
 - [ ] My code follows the project's style and conventions
 - [ ] I have tested my changes locally
 - [ ] I have added/updated relevant documentation or comments
-- [ ] My PR title follows the `type: short description` convention
-- [ ] I have linked the relevant issue(s)
+- [ ] My PR title follows the `type(scope): short description` convention
+- [ ] I have linked the relevant issue(s) (or `N/A` if none)
 ```
 
 ## Environment Variables

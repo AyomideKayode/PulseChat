@@ -88,6 +88,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
 
     const uploadResponse = await cloudinary.uploader.upload(dataUri, {
       folder: 'pulsechat/messages',
+      resource_type: 'image',
     });
 
     res.status(200).json({ url: uploadResponse.secure_url, publicId: uploadResponse.public_id });

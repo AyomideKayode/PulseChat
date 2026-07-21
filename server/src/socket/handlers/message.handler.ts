@@ -57,6 +57,11 @@ export async function handleSendMessage(
       return;
     }
 
+    if (image && (typeof image !== 'string' || image.length > 2048)) {
+      ack({ success: false, error: 'Invalid image reference' });
+      return;
+    }
+
     const receiverObjectId = new mongoose.Types.ObjectId(receiverId);
     const senderObjectId = new mongoose.Types.ObjectId(user._id.toString());
 
@@ -95,8 +100,9 @@ export async function handleSendMessage(
       { upsert: true },
     );
 
-    // Emit to receiver's room and back to sender
+    // Emit to receiver's room and all of the sender's sockets
     socket.to(`user:${receiverId}`).emit('new_message', messageJson);
+    socket.to(`user:${user._id.toString()}`).emit('new_message', messageJson);
     socket.emit('new_message', messageJson);
 
     ack({ success: true, message: messageJson });

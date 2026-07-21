@@ -42,7 +42,7 @@ export async function authenticateSocket(socket: Socket): Promise<void> {
     }
 
     socket.data.user = user;
-  } catch (error) {
-    socket.disconnect();
+  } catch {
+    // Error handled upstream — socket/index.ts calls next(new Error(...))
   }
 }
