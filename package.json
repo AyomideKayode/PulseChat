@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/AyomideKayode/PulseChat/issues"
   },
-  "homepage": "https://github.com/AyomideKayode/PulseChat#readme"
+  "homepage": "https://github.com/AyomideKayode/PulseChat#readme",
+  "devDependencies": {
+    "prettier": "^3.9.5"
+  }
 }
