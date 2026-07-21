@@ -1,7 +1,9 @@
-// server/src/models/user.model.js
-import mongoose from 'mongoose';
+// server/src/models/user.model.ts
 
-const userSchema = new mongoose.Schema(
+import mongoose, { Schema } from 'mongoose'
+import { IUserDocument } from '../types/user.types.js'
+
+const userSchema = new Schema<IUserDocument>(
   {
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -12,8 +14,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   { timestamps: true },
-);
+)
 
-const User = mongoose.model('User', userSchema);
-
-export default User;
+const User = mongoose.model<IUserDocument>('User', userSchema)
+export default User
