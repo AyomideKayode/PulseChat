@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { IConversation } from '../types/message.types';
 import TopBar from './TopBar';
 import Sidebar from './Sidebar';
@@ -5,9 +6,10 @@ import Sidebar from './Sidebar';
 interface Props {
   activeConversation: IConversation | null;
   onSelectConversation: (c: IConversation) => void;
+  children?: ReactNode;
 }
 
-export default function ChatLayout({ activeConversation, onSelectConversation }: Props) {
+export default function ChatLayout({ activeConversation, onSelectConversation, children }: Props) {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TopBar />
@@ -25,9 +27,7 @@ export default function ChatLayout({ activeConversation, onSelectConversation }:
           }}
         >
           {activeConversation ? (
-            <p style={{ padding: '20px', color: 'var(--text-secondary)' }}>
-              Active conversation placeholder
-            </p>
+            children
           ) : (
             <div
               style={{
