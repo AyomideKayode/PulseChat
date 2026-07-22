@@ -3,6 +3,7 @@ import AuthPage from './pages/AuthPage';
 import ChatPage from './pages/ChatPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { SocketProvider } from './contexts/SocketContext';
 
 function App() {
   return (
@@ -15,7 +16,9 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <ChatPage />
+                <SocketProvider>
+                  <ChatPage />
+                </SocketProvider>
               </ProtectedRoute>
             }
           />
