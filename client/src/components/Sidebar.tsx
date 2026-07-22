@@ -13,6 +13,7 @@ export default function Sidebar({ activeId, onSelectConversation }: Props) {
 
   return (
     <aside
+      className="sidebar"
       style={{
         width: '340px',
         borderRight: '1px solid var(--border)',

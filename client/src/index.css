@@ -70,3 +70,10 @@ body {
     opacity: 1;
   }
 }
+
+@media (max-width: 767px) {
+  .sidebar {
+    width: 100% !important;
+    border-right: none !important;
+  }
+}

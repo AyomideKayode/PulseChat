@@ -23,6 +23,11 @@ export default function ChatPage() {
   const { isPartnerTyping, emitTyping } = useTypingIndicator(otherUserId);
 
   useEffect(() => {
+    if (!activeConversation?._id || !socket) return;
+    socket.emit('mark_read', { conversationId: activeConversation._id }, () => {});
+  }, [activeConversation?._id, socket]);
+
+  useEffect(() => {
     if (!socket) return;
 
     const handleNewMessage = (message: IMessage) => {

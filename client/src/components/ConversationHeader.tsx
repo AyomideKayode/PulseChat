@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { useSocket } from '../contexts/SocketContext';
 import type { IConversation } from '../types/message.types';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +12,16 @@ interface Props {
 export default function ConversationHeader({ conversation, onBack }: Props) {
   const { onlineUsers } = useSocket();
   const { user } = useAuth();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   const other = conversation.participants.find((p) => p._id !== user?._id) ?? conversation.participants[0];
   const isOnline = other ? onlineUsers.has(other._id) : false;
 
@@ -23,19 +35,21 @@ export default function ConversationHeader({ conversation, onBack }: Props) {
         gap: '12px',
       }}
     >
-      <button
-        onClick={onBack}
-        style={{
-          display: 'none',
-          background: 'none',
-          border: 'none',
-          color: 'var(--text-secondary)',
-          cursor: 'pointer',
-          fontSize: '1.25rem',
-        }}
-      >
-        ←
-      </button>
+      {isMobile && (
+        <button
+          onClick={onBack}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            padding: '4px',
+            display: 'flex',
+          }}
+        >
+          <ArrowLeft size={20} />
+        </button>
+      )}
       <div>
         <p style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{other?.fullName ?? 'Unknown'}</p>
         <p
