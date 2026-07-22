@@ -4,9 +4,10 @@ import { api } from '../services/api';
 
 interface Props {
   onSend: (text?: string, image?: string) => void;
+  onTyping?: () => void;
 }
 
-export default function MessageInput({ onSend }: Props) {
+export default function MessageInput({ onSend, onTyping }: Props) {
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -64,7 +65,10 @@ export default function MessageInput({ onSend }: Props) {
       />
       <textarea
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => {
+          setText(e.target.value);
+          onTyping?.();
+        }}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         rows={1}

@@ -1,12 +1,14 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import { useMessages } from '../hooks/useMessages';
+import { useTypingIndicator } from '../hooks/useTypingIndicator';
 import ChatLayout from '../components/ChatLayout';
 import ConversationHeader from '../components/ConversationHeader';
 import MessageWindow from '../components/MessageWindow';
 import MessageInput from '../components/MessageInput';
-import type { IConversation } from '../types/message.types';
+import TypingIndicator from '../components/TypingIndicator';
+import type { IConversation, IMessage } from '../types/message.types';
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -18,6 +20,23 @@ export default function ChatPage() {
     : null;
 
   const { messages, loading, hasMore, loadMore, addMessage } = useMessages(otherUserId);
+  const { isPartnerTyping, emitTyping } = useTypingIndicator(otherUserId);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewMessage = (message: IMessage) => {
+      const senderId = typeof message.senderId === 'string' ? message.senderId : message.senderId._id;
+      if (senderId === otherUserId) {
+        addMessage(message);
+      }
+    };
+
+    socket.on('new_message', handleNewMessage);
+    return () => {
+      socket.off('new_message', handleNewMessage);
+    };
+  }, [socket, otherUserId, addMessage]);
 
   const handleSend = useCallback(
     (text?: string, image?: string) => {
@@ -30,6 +49,10 @@ export default function ChatPage() {
     },
     [otherUserId, socket, addMessage],
   );
+
+  const other = activeConversation
+    ? activeConversation.participants.find((p) => p._id !== user?._id)
+    : null;
 
   return (
     <ChatLayout
@@ -49,7 +72,8 @@ export default function ChatPage() {
             hasMore={hasMore}
             onLoadMore={loadMore}
           />
-          <MessageInput onSend={handleSend} />
+          {isPartnerTyping && other && <TypingIndicator name={other.fullName} />}
+          <MessageInput onSend={handleSend} onTyping={emitTyping} />
         </>
       )}
     </ChatLayout>
