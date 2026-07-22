@@ -7,11 +7,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 
+import helmet from 'helmet';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import conversationRoutes from './routes/conversation.route.js';
 import { connectDB } from './lib/db.js';
 import { ENV } from './lib/env.js';
+import { setupSocket } from './socket/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,13 +25,13 @@ const PORT = ENV.PORT || 5000;
 
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
+app.use(helmet());
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/conversations', conversationRoutes);
 
-// Socket.IO (wired in Phase 2)
 const io = new Server(httpServer, {
   cors: {
     origin: ENV.CLIENT_URL,
@@ -37,7 +39,7 @@ const io = new Server(httpServer, {
   },
 });
 
-// TODO: Phase 2 — wire Socket.IO auth middleware and event handlers
+setupSocket(io);
 
 // Serve static frontend in production
 if (ENV.NODE_ENV === 'production') {

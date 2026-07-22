@@ -2,6 +2,7 @@
 
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import cloudinary from '../lib/cloudinary.js';
 import Message from '../models/message.model.js';
 import User from '../models/user.model.js';
 import Conversation from '../models/conversation.model.js';
@@ -70,6 +71,29 @@ export const getConversations = async (req: Request, res: Response): Promise<voi
     res.status(200).json(conversations);
   } catch (error) {
     console.error('Error fetching conversations:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const uploadFile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const file = req.file;
+    if (!file) {
+      res.status(400).json({ message: 'No file provided' });
+      return;
+    }
+
+    const base64 = file.buffer.toString('base64');
+    const dataUri = `data:${file.mimetype};base64,${base64}`;
+
+    const uploadResponse = await cloudinary.uploader.upload(dataUri, {
+      folder: 'pulsechat/messages',
+      resource_type: 'image',
+    });
+
+    res.status(200).json({ url: uploadResponse.secure_url, publicId: uploadResponse.public_id });
+  } catch (error) {
+    console.error('Error uploading file:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

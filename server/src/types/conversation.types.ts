@@ -3,6 +3,7 @@
 import { Document, Types } from 'mongoose';
 
 export interface IConversation {
+  pairKey: string;
   participants: [Types.ObjectId, Types.ObjectId];
   lastMessage?: {
     text: string;
