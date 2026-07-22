@@ -80,25 +80,47 @@ export async function handleSendMessage(
 
     const messageJson = populatedMessage.toObject() as unknown as IMessage;
 
-    // Upsert conversation
+    // Upsert conversation by unique pairKey (prevents duplicates)
     const participantIds = [senderObjectId, receiverObjectId].sort((a, b) =>
       a.toString().localeCompare(b.toString()),
     );
+    const pairKey = participantIds.map((id) => id.toString()).join(':');
 
-    await Conversation.findOneAndUpdate(
-      { participants: { $all: participantIds, $size: 2 } },
-      {
-        $setOnInsert: { participants: participantIds },
-        $set: {
-          lastMessage: {
-            text: text?.trim() || '[Image]',
-            senderId: senderObjectId,
-            createdAt: message.createdAt,
+    try {
+      await Conversation.findOneAndUpdate(
+        { pairKey },
+        {
+          $setOnInsert: { participants: participantIds, pairKey },
+          $set: {
+            lastMessage: {
+              text: text?.trim() || '[Image]',
+              senderId: senderObjectId,
+              createdAt: message.createdAt,
+            },
           },
+          $inc: { [`unreadCount.${receiverId}`]: 1 },
         },
-      },
-      { upsert: true },
-    );
+        { upsert: true },
+      );
+    } catch (err: unknown) {
+      if ((err as { code?: number }).code === 11000) {
+        await Conversation.findOneAndUpdate(
+          { pairKey },
+          {
+            $set: {
+              lastMessage: {
+                text: text?.trim() || '[Image]',
+                senderId: senderObjectId,
+                createdAt: message.createdAt,
+              },
+            },
+            $inc: { [`unreadCount.${receiverId}`]: 1 },
+          },
+        );
+      } else {
+        throw err;
+      }
+    }
 
     // Emit to receiver's room and all of the sender's sockets
     socket.to(`user:${receiverId}`).emit('new_message', messageJson);

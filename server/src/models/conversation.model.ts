@@ -5,6 +5,7 @@ import { IConversationDocument } from '../types/conversation.types.js';
 
 const conversationSchema = new Schema<IConversationDocument>(
   {
+    pairKey: { type: String, unique: true },
     participants: {
       type: [Schema.Types.ObjectId],
       ref: 'User',

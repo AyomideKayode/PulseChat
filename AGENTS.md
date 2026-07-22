@@ -66,6 +66,7 @@ npm run dev --prefix client    # Vite dev server on :5173
 - Agent stages changes but does **not** commit until you explicitly say so.
 - When you give the commit signal, agent groups changes into logical commits following the convention below.
 - Agent should push back with reasoning when it has a better-informed opinion, not blindly follow suggestions.
+- On review runs, agent must report findings (strengths, issues, verdict) to the user FIRST before making any changes. Only implement fixes after user confirms which ones to address.
 
 ## Commit Convention
 
