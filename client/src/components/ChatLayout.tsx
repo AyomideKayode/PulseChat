@@ -1,5 +1,6 @@
 import type { IConversation } from '../types/message.types';
 import TopBar from './TopBar';
+import Sidebar from './Sidebar';
 
 interface Props {
   activeConversation: IConversation | null;
@@ -11,19 +12,10 @@ export default function ChatLayout({ activeConversation, onSelectConversation }:
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TopBar />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        <aside
-          style={{
-            width: '340px',
-            borderRight: '1px solid var(--border)',
-            display: 'flex',
-            flexDirection: 'column',
-            background: 'var(--surface)',
-          }}
-        >
-          <p style={{ padding: '20px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-            Conversations
-          </p>
-        </aside>
+        <Sidebar
+          activeId={activeConversation?._id ?? null}
+          onSelectConversation={onSelectConversation}
+        />
         <main
           style={{
             flex: 1,
