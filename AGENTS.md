@@ -60,6 +60,7 @@ npm run dev --prefix client    # Vite dev server on :5173
 - **Prettier** for all files — configured in `.prettierrc` (semicolons: true, single quotes, trailing commas). Run `npx prettier --write .` before committing.
 - ESLint in client (`eslint.config.js`)
 - `Record<string, unknown>` for dynamic objects, never `any`
+- **Client styling:** Tailwind v4 via `@tailwindcss/vite` plugin. Theme tokens defined in `client/src/index.css` under `@theme` (colors, fonts, animations). Dark/light switching via `[data-theme='light']` overriding `--color-*` vars. Use semantic classes (`bg-surface`, `text-text-primary`, `border-border`, `font-sans`, `font-serif`, `animate-message-in`). Never use inline `style={{...}}` unless dynamic computed values prevent it (e.g., avatar background color from hash).
 
 ## Workflow
 
@@ -67,6 +68,7 @@ npm run dev --prefix client    # Vite dev server on :5173
 - When you give the commit signal, agent groups changes into logical commits following the convention below.
 - Agent should push back with reasoning when it has a better-informed opinion, not blindly follow suggestions.
 - On review runs, agent must report findings (strengths, issues, verdict) to the user FIRST before making any changes. Only implement fixes after user confirms which ones to address.
+- Before implementing frontend work, always reference `docs/superpowers/specs/pulsechat-client-design.md` for the full design spec (colors, typography, layout, animations, component tree, state management).
 
 ## Commit Convention
 

@@ -61,15 +61,16 @@ Index: `{ senderId: 1, receiverId: 1, createdAt: -1 }`
 ### Conversation (new)
 
 ```typescript
-participants: [ObjectId, ObjectId] — exactly 2, compound unique index
+pairKey: string (unique) — sorted participant IDs joined by ':'
+participants: [ObjectId, ObjectId] — exactly 2
 lastMessage?: { text: string, senderId: ObjectId, createdAt: Date }
 unreadCount: Map<string, number> — userId → count
 timestamps
 ```
 
-Index: `{ participants: 1 }` (compound, unique). Query: find by both participant IDs regardless of order.
+Index: `{ participants: 1 }` (for querying by participant). **`pairKey` with `{ unique: true }`** prevents duplicate conversations at the DB level (avoids multikey index limitations on arrays).
 
-Conversation is created atomically on first `send_message` if none exists between the pair.
+Conversation is created atomically on first `send_message` using `{ pairKey }` as the upsert filter. On `DuplicateKeyError` (code 11000), retries as a simple update.
 
 ## Socket.IO Architecture
 
@@ -151,38 +152,35 @@ Every component handles: loading, empty (no conversations, no messages), error, 
 
 ## Execution Phases
 
-### Phase 1 — Server: TypeScript Migration (Day 1)
+### ✅ Phase 1 — Server: TypeScript Migration
 
-1. Install TS deps: `typescript`, `@types/node`, `@types/express`, `@types/cookie-parser`, `@types/bcryptjs`, `@types/jsonwebtoken`
-2. Create `tsconfig.json` — strict, NodeNext module, ES2022 target, outDir: dist, rootDir: src
-3. Write type definitions (`src/types/`):
-   - `IUser` interface matching user model
-   - `IMessage` interface matching message model (extend with status field)
-   - `IConversation` interface for new conversation model
-   - Socket event payload types
-4. Migrate `src/lib/*` — env.ts, db.ts, utils.ts, cloudinary.ts, arcjet.ts, resend.ts
-5. Migrate `src/models/*` — user.model.ts (existing), message.model.ts (add status), conversation.model.ts (new)
-6. Migrate `src/middleware/*` — auth.middleware.ts, arcjet.middleware.ts
-7. Migrate `src/controllers/*` — auth.controller.ts, message.controller.ts
-8. Migrate `src/routes/*` — auth.route.ts, message.route.ts
-9. Migrate `src/server.ts`
-10. Verify: `npm run build` and `npm run dev` work
+1. ✅ Install TS deps — `typescript`, `@types/node`, `@types/express`, `@types/cookie-parser`, `@types/bcryptjs`, `@types/jsonwebtoken`
+2. ✅ Create `tsconfig.json` — strict, NodeNext module, ES2022 target, outDir: dist, rootDir: src
+3. ✅ Write type definitions (`src/types/`): IUser, IMessage, IConversation, Socket event payloads, express.d.ts
+4. ✅ Migrate `src/lib/*` — env.ts, db.ts, utils.ts, cloudinary.ts, arcjet.ts, resend.ts
+5. ✅ Migrate `src/models/*` — user.model.ts, message.model.ts (with status), conversation.model.ts (with pairKey)
+6. ✅ Migrate `src/middleware/*` — auth.middleware.ts, arcjet.middleware.ts
+7. ✅ Migrate `src/controllers/*` — auth.controller.ts, message.controller.ts (expanded)
+8. ✅ Migrate `src/routes/*` — auth.route.ts, message.route.ts (expanded), conversation.route.ts (new)
+9. ✅ Migrate `src/server.ts` — with Socket.IO skeleton + helmet
+10. ✅ Verify: `npm run build` passes; REST endpoints smoke-tested
 
-### Phase 2 — Server: Socket.IO + Message CRUD (Day 2-3)
+### ✅ Phase 2 — Server: Socket.IO + Message CRUD
 
-1. Install socket.io + @types/socket.io
-2. Build `src/socket/index.ts`:
-   - Socket.IO server initialization (attach to HTTP server)
-   - Auth middleware (parse JWT from handshake cookie)
-   - Presence tracking (`Map<userId, Set<socketId>>`)
-   - Event handlers: send_message, mark_read, typing_start, typing_stop
-   - Conversation auto-creation on first message
-3. Build message routes:
+1. ✅ Install socket.io
+2. ✅ Build `src/socket/`:
+   - `index.ts` — Socket.IO init, auth middleware, handler wiring
+   - `auth.ts` — JWT cookie parse from handshake
+   - `presence.ts` — `Map<userId, Set<socketId>>`, room-based
+   - `handlers/message.handler.ts` — send_message with rate limiter (30/10s), validation, pairKey upsert, multi-tab emit
+   - `handlers/typing.handler.ts` — typing_start/stop relay
+   - `handlers/read.handler.ts` — mark_read with participant verification
+3. ✅ Build message routes:
    - `GET /api/messages/:userId` — cursor-based pagination by `_id`
-   - `POST /api/messages/upload` — multer + Cloudinary upload
-4. Build conversation routes:
+   - `POST /api/messages/upload` — multer (image/*, 5MB limit) + Cloudinary
+4. ✅ Build conversation routes:
    - `GET /api/conversations` — list with last message preview + unread counts
-5. Verify: manual test with Socket.IO client or curl for REST
+5. ✅ Verify: curl smoke-test + Socket.IO client test
 
 ### Phase 3 — Client: TypeScript Chat UI (Day 4-6)
 
@@ -239,7 +237,7 @@ Every component handles: loading, empty (no conversations, no messages), error, 
 
 - **WebSocket auth**: JWT is set as HTTP-only cookie. Socket.IO handshake includes the cookie header. Server middleware parses and verifies. No need for client to read the token.
 - **Multi-tab presence**: User with 2+ tabs has 2+ socketIds in presence map. Only marked offline when ALL sockets disconnect.
-- **Conversation deduplication**: Before creating Conversation, query both orderings of participants. Compound unique index prevents race duplicates.
+- **Conversation deduplication**: Upsert by `pairKey` (sorted participant IDs joined by `:`) with `{ unique: true }` in the schema. On `DuplicateKeyError` (concurrent creation race), catch and retry as simple update. Avoids multikey index limitations on arrays.
 - **Message order**: Sort by `createdAt` (or `_id` which embeds timestamp). Pagination uses cursor-based (`_id` before filter), not offset.
 - **Optimistic sends**: Sender sees message immediately in UI. On ack failure, mark with error state and offer retry.
 - **Rate limiting**: Arcjet on auth routes. In-memory rate limiter on `send_message` (30 events per 10s per user — configurable).
