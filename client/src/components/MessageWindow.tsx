@@ -28,47 +28,22 @@ export default function MessageWindow({
   return (
     <div
       ref={containerRef}
-      style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className="flex-1 overflow-y-auto p-4 flex flex-col"
     >
       {hasMore && !loading && (
         <button
           onClick={onLoadMore}
-          style={{
-            alignSelf: 'center',
-            padding: '8px 16px',
-            marginBottom: '12px',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-            background: 'var(--card)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            fontSize: '0.8125rem',
-          }}
+          className="self-center px-4 py-2 mb-3 border border-border rounded-lg bg-card text-text-secondary cursor-pointer text-sm"
         >
           Load older messages
         </button>
       )}
       {loading && (
-        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '20px' }}>
-          Loading...
-        </p>
+        <p className="text-center text-text-secondary p-5">Loading...</p>
       )}
       {messages.length === 0 && !loading && (
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <p style={{ color: 'var(--text-secondary)' }}>Say hello! Start the conversation.</p>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-text-secondary">Say hello! Start the conversation.</p>
         </div>
       )}
       {messages.map((msg) => (

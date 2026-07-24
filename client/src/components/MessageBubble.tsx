@@ -30,64 +30,30 @@ export default function MessageBubble({ message, isOwn }: Props) {
   });
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: '8px',
-        justifyContent: isOwn ? 'flex-end' : 'flex-start',
-        marginBottom: '4px',
-        animation: 'messageIn 200ms ease-out',
-      }}
-    >
+    <div className={`flex gap-2 mb-1 animate-message-in ${isOwn ? 'justify-end' : 'justify-start'}`}>
       {!isOwn && (
-        <div style={{ flexShrink: 0, alignSelf: 'flex-end', marginBottom: '4px' }}>
+        <div className="shrink-0 self-end mb-1">
           <div
-            style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '50%',
-              background: getAvatarColor(senderId),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: '0.625rem',
-            }}
+            style={{ background: getAvatarColor(senderId) }}
+            className="h-7 w-7 rounded-full flex items-center justify-center text-white font-semibold text-[0.625rem]"
           >
             {initials}
           </div>
         </div>
       )}
       <div
-        style={{
-          maxWidth: '70%',
-          padding: '10px 14px',
-          borderRadius: '12px',
-          background: isOwn ? 'var(--bubble-sent)' : 'var(--card)',
-          color: 'var(--text-primary)',
-        }}
+        className={`max-w-[70%] px-3.5 py-2.5 rounded-xl ${isOwn ? 'bg-bubble-sent' : 'bg-card'} text-text-primary`}
       >
-        {message.text && <p style={{ fontSize: '0.9375rem', lineHeight: 1.4 }}>{message.text}</p>}
+        {message.text && <p className="text-[0.9375rem] leading-[1.4]">{message.text}</p>}
         {message.image && (
           <img
             src={message.image}
             alt="Shared image"
-            style={{
-              maxWidth: '100%',
-              borderRadius: '8px',
-              marginTop: '4px',
-              display: 'block',
-            }}
+            className="max-w-full rounded-lg mt-1 block"
           />
         )}
         <p
-          style={{
-            fontSize: '0.6875rem',
-            marginTop: '4px',
-            color: isOwn ? 'var(--text-secondary)' : 'var(--accent)',
-            textAlign: 'right',
-          }}
+          className={`text-[0.6875rem] mt-1 text-right ${isOwn ? 'text-text-secondary' : 'text-accent'}`}
         >
           {time}
         </p>

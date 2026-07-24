@@ -4,34 +4,17 @@ interface Props {
 
 export default function TypingIndicator({ name }: Props) {
   return (
-    <div
-      style={{
-        padding: '4px 16px 8px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        color: 'var(--accent)',
-        fontSize: '0.8125rem',
-        animation: 'fadeIn 150ms ease-out',
-      }}
-    >
-      <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-        <span style={dotStyle(0)} />
-        <span style={dotStyle(0.15)} />
-        <span style={dotStyle(0.3)} />
+    <div className="px-4 pb-2 flex items-center gap-1.5 text-accent text-sm animate-fade-in">
+      <div className="flex gap-0.75 items-center">
+        {[0, 0.15, 0.3].map((delay, i) => (
+          <span
+            key={i}
+            className="w-1.5 h-1.5 rounded-full bg-accent opacity-60"
+            style={{ animation: `bounce 1s ease-in-out ${delay}s infinite` }}
+          />
+        ))}
       </div>
       {name} is typing...
     </div>
   );
-}
-
-function dotStyle(delay: number): React.CSSProperties {
-  return {
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    background: 'var(--accent)',
-    opacity: 0.6,
-    animation: `bounce 1s ease-in-out ${delay}s infinite`,
-  };
 }

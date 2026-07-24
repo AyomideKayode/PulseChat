@@ -11,25 +11,21 @@ interface Props {
 export default function ConversationList({ conversations, activeId, onSelect, loading }: Props) {
   if (loading) {
     return (
-      <p style={{ padding: '20px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-        Loading...
-      </p>
+      <p className="p-5 text-text-secondary text-center">Loading...</p>
     );
   }
 
   if (conversations.length === 0) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+      <div className="p-5 text-center text-text-secondary">
         <p>No conversations yet.</p>
-        <p style={{ fontSize: '0.875rem', marginTop: '8px' }}>
-          Search for someone to start chatting.
-        </p>
+        <p className="text-sm mt-2">Search for someone to start chatting.</p>
       </div>
     );
   }
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto' }}>
+    <div className="flex-1 overflow-y-auto">
       {conversations.map((c) => (
         <ConversationItem
           key={c._id}

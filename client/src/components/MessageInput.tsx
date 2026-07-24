@@ -43,17 +43,12 @@ export default function MessageInput({ onSend, onTyping }: Props) {
   }
 
   return (
-    <div
-      style={{
-        padding: '12px 16px',
-        borderTop: '1px solid var(--border)',
-        background: 'var(--surface)',
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: '8px',
-      }}
-    >
-      <button onClick={() => fileRef.current?.click()} style={iconBtnStyle} disabled={uploading}>
+    <div className="px-4 py-3 border-t border-border bg-surface flex items-end gap-2">
+      <button
+        onClick={() => fileRef.current?.click()}
+        className="bg-transparent border-none text-text-secondary cursor-pointer p-2 flex rounded-lg hover:text-accent transition-colors duration-200"
+        disabled={uploading}
+      >
         <ImageIcon size={20} />
       </button>
       <input
@@ -61,7 +56,7 @@ export default function MessageInput({ onSend, onTyping }: Props) {
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
-        style={{ display: 'none' }}
+        className="hidden"
       />
       <textarea
         value={text}
@@ -72,41 +67,17 @@ export default function MessageInput({ onSend, onTyping }: Props) {
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         rows={1}
-        style={{
-          flex: 1,
-          padding: '10px 14px',
-          borderRadius: '10px',
-          border: '1px solid var(--border)',
-          background: 'var(--card)',
-          color: 'var(--text-primary)',
-          fontSize: '0.9375rem',
-          resize: 'none',
-          outline: 'none',
-          fontFamily: 'inherit',
-          maxHeight: '120px',
-        }}
+        className="flex-1 px-3.5 py-2.5 rounded-xl border border-border bg-card text-text-primary text-[0.9375rem] resize-none outline-none font-sans max-h-30"
       />
       <button
         onClick={handleSend}
         disabled={!text.trim() || uploading}
-        style={{
-          ...iconBtnStyle,
-          color: text.trim() ? 'var(--accent)' : 'var(--text-secondary)',
-          transition: 'color 0.2s',
-        }}
+        className={`bg-transparent border-none cursor-pointer p-2 flex rounded-lg transition-colors duration-200 ${
+          text.trim() ? 'text-accent' : 'text-text-secondary'
+        }`}
       >
         <Send size={20} />
       </button>
     </div>
   );
 }
-
-const iconBtnStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  color: 'var(--text-secondary)',
-  cursor: 'pointer',
-  padding: '8px',
-  display: 'flex',
-  borderRadius: '8px',
-};

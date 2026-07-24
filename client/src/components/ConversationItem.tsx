@@ -36,92 +36,38 @@ export default function ConversationItem({ conversation, isActive, onSelect }: P
   return (
     <button
       onClick={onSelect}
-      style={{
-        width: '100%',
-        padding: '12px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        border: 'none',
-        background: isActive ? 'var(--card)' : 'transparent',
-        color: 'var(--text-primary)',
-        cursor: 'pointer',
-        textAlign: 'left',
-      }}
+      className={`w-full px-4 py-3 flex items-center gap-3 border-none text-text-primary cursor-pointer text-left ${
+        isActive ? 'bg-card' : 'bg-transparent'
+      }`}
     >
-      <div style={{ position: 'relative', flexShrink: 0 }}>
+      <div className="relative shrink-0">
         <div
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '50%',
-            background: getAvatarColor(other._id),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-          }}
+          className="w-11 h-11 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+          style={{ background: getAvatarColor(other._id) }}
         >
           {initials}
         </div>
         <div
-          style={{
-            position: 'absolute',
-            bottom: '0',
-            right: '0',
-            width: '12px',
-            height: '12px',
-            borderRadius: '50%',
-            border: '2px solid var(--surface)',
-            background: isOnline ? 'var(--online)' : '#666',
-            transition: 'background 0.3s',
-          }}
+          className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-surface transition-colors duration-300 ${
+            isOnline ? 'bg-online' : 'bg-[#666]'
+          }`}
         />
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 500, fontSize: '0.9375rem' }}>{other.fullName}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-[0.9375rem]">{other.fullName}</span>
           {conversation.lastMessage && (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            <span className="text-xs text-text-secondary">
               {new Date(conversation.lastMessage.createdAt).toLocaleDateString()}
             </span>
           )}
         </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: '2px',
-          }}
-        >
-          <span
-            style={{
-              fontSize: '0.8125rem',
-              color: 'var(--text-secondary)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: '200px',
-            }}
-          >
+        <div className="flex justify-between items-center mt-0.5">
+          <span className="text-sm text-text-secondary truncate max-w-50">
             {conversation.lastMessage?.text || 'No messages yet'}
           </span>
           {unread > 0 && (
-            <span
-              style={{
-                background: 'var(--accent)',
-                color: '#fff',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                padding: '2px 8px',
-                borderRadius: '10px',
-                minWidth: '20px',
-                textAlign: 'center',
-              }}
-            >
+            <span className="bg-accent text-white text-xs font-semibold px-2 py-0.5 rounded-full min-w-5 text-center">
               {unread}
             </span>
           )}
