@@ -1,39 +1,37 @@
-:root {
-  --surface: #1A1817;
-  --card: #242120;
-  --bubble-sent: rgba(200, 121, 65, 0.2);
-  --accent: #C87941;
-  --accent-hover: #B06830;
-  --text-primary: #F0EDEA;
-  --text-secondary: #8B8580;
-  --border: #2D2926;
-  --online: #4CAF50;
+@import "tailwindcss";
 
-  font-family: 'Inter', system-ui, sans-serif;
-  color: var(--text-primary);
-  background-color: var(--surface);
+@theme {
+  --color-surface: #1A1817;
+  --color-card: #242120;
+  --color-bubble-sent: rgba(200, 121, 65, 0.2);
+  --color-accent: #C87941;
+  --color-accent-hover: #B06830;
+  --color-text-primary: #F0EDEA;
+  --color-text-secondary: #8B8580;
+  --color-border: #2D2926;
+  --color-online: #4CAF50;
+  --font-serif: "Instrument Serif", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --animate-message-in: messageIn 200ms ease-out;
+  --animate-fade-in: fadeIn 150ms ease-out;
+  --animate-bounce-dot: bounce 1s ease-in-out infinite;
 }
 
 [data-theme='light'] {
-  --surface: #F8F6F3;
-  --card: #FFFFFF;
-  --bubble-sent: rgba(200, 121, 65, 0.12);
-  --accent: #C87941;
-  --accent-hover: #B06830;
-  --text-primary: #1A1817;
-  --text-secondary: #8B8580;
-  --border: #E8E4DF;
-  --online: #4CAF50;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --color-surface: #F8F6F3;
+  --color-card: #FFFFFF;
+  --color-bubble-sent: rgba(200, 121, 65, 0.12);
+  --color-accent: #C87941;
+  --color-accent-hover: #B06830;
+  --color-text-primary: #1A1817;
+  --color-text-secondary: #8B8580;
+  --color-border: #E8E4DF;
+  --color-online: #4CAF50;
 }
 
 body {
-  min-height: 100dvh;
+  color: var(--color-text-primary);
 }
 
 #root {
