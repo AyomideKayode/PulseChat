@@ -36,7 +36,7 @@ export function useTypingIndicator(receiverId: string | null) {
     if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     typingTimerRef.current = setTimeout(() => {
       socket.emit('typing_stop', { receiverId });
-    }, 2000);
+    }, 4000);
   }, [socket, receiverId]);
 
   return { isPartnerTyping, emitTyping };
