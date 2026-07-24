@@ -7,6 +7,57 @@ import Message from '../models/message.model.js';
 import User from '../models/user.model.js';
 import Conversation from '../models/conversation.model.js';
 
+export const getOrCreateConversation = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const currentUserId = req.user!._id;
+    const targetUserId = req.params.userId as string;
+
+    if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
+      res.status(400).json({ message: 'Invalid user ID' });
+      return;
+    }
+
+    if (currentUserId.toString() === targetUserId) {
+      res.status(400).json({ message: 'Cannot create conversation with yourself' });
+      return;
+    }
+
+    const currentObjectId = new mongoose.Types.ObjectId(currentUserId.toString());
+    const targetObjectId = new mongoose.Types.ObjectId(targetUserId);
+
+    const participantIds = [currentObjectId, targetObjectId].sort((a, b) =>
+      a.toString().localeCompare(b.toString()),
+    );
+    const pairKey = participantIds.map((id) => id.toString()).join(':');
+
+    let conversation;
+
+    try {
+      conversation = await Conversation.findOneAndUpdate(
+        { pairKey },
+        {
+          $setOnInsert: { participants: participantIds, pairKey },
+        },
+        { upsert: true, new: true },
+      ).populate('participants', 'fullName email profilePicture');
+    } catch (err: unknown) {
+      if ((err as { code?: number }).code === 11000) {
+        conversation = await Conversation.findOne({ pairKey }).populate(
+          'participants',
+          'fullName email profilePicture',
+        );
+      } else {
+        throw err;
+      }
+    }
+
+    res.status(200).json(conversation);
+  } catch (error) {
+    console.error('Error creating conversation:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const getAllContacts = async (req: Request, res: Response): Promise<void> => {
   try {
     const loggedInUserId = req.user!._id;
