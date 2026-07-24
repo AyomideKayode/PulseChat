@@ -31,7 +31,8 @@ export default function ChatPage() {
     if (!socket) return;
 
     const handleNewMessage = (message: IMessage) => {
-      const senderId = typeof message.senderId === 'string' ? message.senderId : message.senderId._id;
+      const senderId =
+        typeof message.senderId === 'string' ? message.senderId : message.senderId._id;
       if (senderId === otherUserId) {
         addMessage(message);
       }

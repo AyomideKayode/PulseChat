@@ -1,6 +1,7 @@
 import UserSearch from './UserSearch';
 import ConversationList from './ConversationList';
 import { useConversations } from '../hooks/useConversations';
+import { useSocket } from '../contexts/SocketContext';
 import type { IConversation } from '../types/message.types';
 
 interface Props {
@@ -9,20 +10,18 @@ interface Props {
 }
 
 export default function Sidebar({ activeId, onSelectConversation }: Props) {
-  const { conversations, loading } = useConversations();
+  const { socket } = useSocket();
+  const { conversations, loading, refetch } = useConversations(socket);
 
   return (
-    <aside
-      className="sidebar"
-      style={{
-        width: '340px',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'var(--surface)',
-      }}
-    >
-      <UserSearch onSelectUser={() => {}} />
+    <aside className="sidebar w-85 border-r border-border flex flex-col bg-surface">
+      <UserSearch
+        existingConversations={conversations}
+        onSelectUser={(conversation) => {
+          onSelectConversation(conversation);
+          refetch();
+        }}
+      />
       <ConversationList
         conversations={conversations}
         activeId={activeId}
