@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from 'react';
 import { createSocket, type TypedSocket } from '../services/socket';
 import { useAuth } from './AuthContext';
+import { playMessageChime } from '../lib/sound';
+import { useSoundToggle } from '../hooks/useSoundToggle';
 
 interface SocketContextValue {
   socket: TypedSocket | null;
@@ -12,6 +14,9 @@ const SocketContext = createContext<SocketContextValue | null>(null);
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { soundEnabled } = useSoundToggle();
+  const soundEnabledRef = useRef(soundEnabled);
+  soundEnabledRef.current = soundEnabled;
   const socketRef = useRef<TypedSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
@@ -41,6 +46,11 @@ export function SocketProvider({ children }: { children: ReactNode }) {
         next.delete(userId);
         return next;
       });
+    });
+    socket.on('new_message', () => {
+      if (soundEnabledRef.current) {
+        playMessageChime();
+      }
     });
 
     socket.connect();
