@@ -36,6 +36,16 @@ export default function ChatPage() {
     }
   }, [activeConversation]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeConversation) {
+        handleBack();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [activeConversation, handleBack]);
+
   const { messages, loading, hasMore, loadMore, addMessage } = useMessages(otherUserId);
   const { isPartnerTyping, emitTyping } = useTypingIndicator(otherUserId);
 
