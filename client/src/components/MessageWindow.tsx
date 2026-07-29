@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { IMessage } from '../types/message.types';
 import MessageBubble from './MessageBubble';
+import MessageSkeleton from './MessageSkeleton';
 import type { IUser } from '../types/auth.types';
 
 interface Props {
@@ -38,9 +39,7 @@ export default function MessageWindow({
           Load older messages
         </button>
       )}
-      {loading && (
-        <p className="text-center text-text-secondary p-5">Loading...</p>
-      )}
+      {loading && <MessageSkeleton />}
       {messages.length === 0 && !loading && (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-text-secondary">Say hello! Start the conversation.</p>

@@ -1,5 +1,6 @@
 import type { IConversation } from '../types/message.types';
 import ConversationItem from './ConversationItem';
+import ConversationSkeleton from './ConversationSkeleton';
 
 interface Props {
   conversations: IConversation[];
@@ -10,9 +11,7 @@ interface Props {
 
 export default function ConversationList({ conversations, activeId, onSelect, loading }: Props) {
   if (loading) {
-    return (
-      <p className="p-5 text-text-secondary text-center">Loading...</p>
-    );
+    return <ConversationSkeleton />;
   }
 
   if (conversations.length === 0) {

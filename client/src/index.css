@@ -69,6 +69,19 @@ body {
   }
 }
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+.shimmer {
+  background: linear-gradient(105deg, transparent 0%, #2D2926 40%, transparent 80%);
+}
+
 @media (max-width: 767px) {
   .sidebar {
     width: 100% !important;
