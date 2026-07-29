@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import { useMessages } from '../hooks/useMessages';
@@ -14,10 +14,27 @@ export default function ChatPage() {
   const { user } = useAuth();
   const { socket } = useSocket();
   const [activeConversation, setActiveConversation] = useState<IConversation | null>(null);
+  const lastActiveRef = useRef<IConversation | null>(null);
+
+  const handleSetConversation = useCallback((c: IConversation | null) => {
+    lastActiveRef.current = c;
+    setActiveConversation(c);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    lastActiveRef.current = null;
+    setActiveConversation(null);
+  }, []);
 
   const otherUserId = activeConversation
     ? (activeConversation.participants.find((p) => p._id !== user?._id)?._id ?? null)
     : null;
+
+  useEffect(() => {
+    if (!activeConversation && lastActiveRef.current) {
+      setActiveConversation(lastActiveRef.current);
+    }
+  }, [activeConversation]);
 
   const { messages, loading, hasMore, loadMore, addMessage } = useMessages(otherUserId);
   const { isPartnerTyping, emitTyping } = useTypingIndicator(otherUserId);
@@ -63,13 +80,13 @@ export default function ChatPage() {
   return (
     <ChatLayout
       activeConversation={activeConversation}
-      onSelectConversation={setActiveConversation}
+      onSelectConversation={handleSetConversation}
     >
       {activeConversation && (
         <>
           <ConversationHeader
             conversation={activeConversation}
-            onBack={() => setActiveConversation(null)}
+            onBack={handleBack}
           />
           <MessageWindow
             messages={messages}

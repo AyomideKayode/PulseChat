@@ -137,3 +137,18 @@ Closes #<if applicable>
 
 Required: `MONGO_URI`, `JWT_SECRET`, `RESEND_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ARCJET_KEY`
 Optional: `PORT` (default 5000), `CLIENT_URL` (default [http://localhost:5173](http://localhost:5173)), `NODE_ENV` (default development)
+
+## Debugging History
+
+### 2026-07-29 — `POST /api/conversations/:userId` returning 200 null
+
+**Problem:** Creating a conversation via POST returned HTTP 200 with body `null`, and the conversation was NOT persisted to MongoDB. `Conversation.create()` and `new Conversation().save()` both appeared to succeed but no document was created.
+
+**Root cause:** A stale UNIQUE index on the `participants` field (`participants_1`) in MongoDB Atlas. The schema defines `conversationSchema.index({ participants: 1 })` (non-unique), but MongoDB had `unique: true` on this index. This prevented any participant from being in more than one conversation. The `save()` threw E11000, which was caught but silently swallowed.
+
+**Fix:**
+1. Dropped the `participants_1` index and recreated it as non-unique via `db.collection('conversations').dropIndex('participants_1')` + `createIndex({ participants: 1 })`.
+2. Added proper 11000 duplicate key handling in the controller (falls back to `findOne` for `pairKey` collisions — covers race conditions).
+3. Replaced `Conversation.create()` with `new Conversation().save()` + explicit `populate()` on the document to avoid Mongoose 9 `create` return behavior.
+
+**Lesson:** Always verify MongoDB indexes match schema expectations when debugging silent write failures. A unique index created by accident (or stale from a prior schema iteration) will reject writes with E11000, and a bare `catch` that doesn't re-check can make it invisible.

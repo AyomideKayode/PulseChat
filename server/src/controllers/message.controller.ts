@@ -30,24 +30,31 @@ export const getOrCreateConversation = async (req: Request, res: Response): Prom
     );
     const pairKey = participantIds.map((id) => id.toString()).join(':');
 
-    let conversation;
+    let conversation = await Conversation.findOne({ pairKey }).populate(
+      'participants',
+      'fullName email profilePicture',
+    );
 
-    try {
-      conversation = await Conversation.findOneAndUpdate(
-        { pairKey },
-        {
-          $setOnInsert: { participants: participantIds, pairKey },
-        },
-        { upsert: true, new: true },
-      ).populate('participants', 'fullName email profilePicture');
-    } catch (err: unknown) {
-      if ((err as { code?: number }).code === 11000) {
-        conversation = await Conversation.findOne({ pairKey }).populate(
+    if (!conversation) {
+      try {
+        conversation = new Conversation({
+          participants: participantIds,
+          pairKey,
+        });
+        await conversation.save();
+        conversation = await conversation.populate(
           'participants',
           'fullName email profilePicture',
         );
-      } else {
-        throw err;
+      } catch (err: unknown) {
+        if ((err as { code?: number }).code === 11000) {
+          conversation = await Conversation.findOne({ pairKey }).populate(
+            'participants',
+            'fullName email profilePicture',
+          );
+        } else {
+          throw err;
+        }
       }
     }
 
