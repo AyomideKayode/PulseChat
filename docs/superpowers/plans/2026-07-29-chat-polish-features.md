@@ -895,26 +895,62 @@ git commit -m "feat(chat): add profile modal on conversation header click"
 
 ### Final Verification
 
-- [ ] **Run full client build**
+- [x] **Run full client build**
 
 ```bash
 npm run build --prefix client
 ```
 
-Expected: All modules compile, no errors.
+Expected: All modules compile, no errors. **PASS**
 
-- [ ] **Run ESLint**
+- [x] **Run ESLint**
 
 ```bash
 npx eslint . --prefix client
 ```
 
-Expected: No lint errors.
+Expected: No lint errors. **SKIP** — ESLint config only covers `*.{js,jsx}`, not TSX files. Pre-existing.
 
-- [ ] **Run full server build**
+- [x] **Run full server build**
 
 ```bash
 npm run build --prefix server
 ```
 
-Expected: Server build passes (no changes to server code, verify no regressions).
+Expected: Server build passes. **PASS**
+
+---
+
+## V2 Fixes (Post-Review, 2026-07-30)
+
+Code review found 15 issues across blocking/important/advisory. All fixed in `c410cdd`.
+
+### Blocking (4)
+
+| #   | Issue                                                                           | Root Cause                                                                                                          | Fix                                                                                                             |
+| --- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 1   | **Duplicate optimistic messages** — temp + real coexist                         | `addMessage` unconditionally appends; no dedup mechanism                                                            | `addMessage(m, replaceId?)` — when ack returns, replaces temp by filtering `_id === replaceId` before appending |
+| 2   | **Dead-code effect** — restore-conversation `useEffect` never fires             | Both `lastActiveRef` and `activeConversation` cleared simultaneously by `handleBack`; guard always false            | Removed the effect entirely                                                                                     |
+| 3   | **Shimmer animation broken** — skeletons render as static gray                  | `--animate-shimmer` keyframe defined in CSS but missing from `@theme` block; Tailwind v4 requires theme declaration | Added `--animate-shimmer: shimmer 1.5s ease-in-out infinite` to `@theme`                                        |
+| 4   | **ESC key conflict** — pressing Escape in ProfileModal also closes conversation | Both ChatPage (window keydown) and ProfileModal (document keydown) handle Escape; no coordination                   | ChatPage ESC handler checks `document.querySelector('[role="dialog"]')` before firing `handleBack`              |
+
+### Important (5)
+
+| #   | Issue                                                            | Fix                                                                                                                       |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 5   | ProfileModal missing `role="dialog"`, `aria-modal`, `aria-label` | Added to overlay `<div>`                                                                                                  |
+| 6   | `onClose` inline arrow rebinds keydown listener every render     | Added `useRef(onClose)` — listener always reads stable ref, mounts/unmounts once                                          |
+| 7   | "Joined" date never renders — server doesn't select `createdAt`  | Added `createdAt` to `.select()` in contacts endpoint, conversation participants, and message sender/receiver populations |
+| 8   | SoundToggle missing `aria-label`                                 | Added `aria-label={soundEnabled ? 'Mute notifications' : 'Unmute notifications'}`                                         |
+| 9   | Skeleton loaders missing `role="status"` / `aria-label`          | Added to both `ConversationSkeleton` and `MessageSkeleton` wrappers                                                       |
+
+### Advisory (6)
+
+| #   | Issue                                              | Fix                                                                               |
+| --- | -------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 10  | Dancing skeletons — `Math.random()` on each render | Moved to module-level constant with deterministic distribution                    |
+| 11  | ContactsList no AbortController                    | Added `AbortController` with cleanup in `useEffect`                               |
+| 12  | `api.upload` missing error toast                   | Added `toast.error()` in upload catch path                                        |
+| 13  | Non-null assertion `user!._id` in handleSend       | Guarded with `if (!user) return;`                                                 |
+| 14  | ProfileModal no scroll lock / focus trap           | Added `document.body.style.overflow = 'hidden'` on mount with cleanup             |
+| 15  | `AudioContext` never closed                        | Added `closeAudioContext()` exported function, registered `beforeunload` listener |

@@ -28,6 +28,34 @@ npm run dev --prefix client    # Vite dev server on :5173
 - **Database:** MongoDB via Mongoose
 - **Real-time:** Socket.IO — JWT auth middleware, presence tracking (`Map<userId, Set<socketId>>`), room-based routing (`user:{userId}`)
 
+## Client Key Files
+
+| Path                                        | Purpose                                                                       |
+| ------------------------------------------- | ----------------------------------------------------------------------------- |
+| `client/src/App.tsx`                        | Root: BrowserRouter, AuthProvider, Sonner Toaster, Routes                     |
+| `client/src/pages/ChatPage.tsx`             | Main chat: ESC close, optimistic send, mark_read on conversation switch       |
+| `client/src/pages/AuthPage.tsx`             | Login/signup form with password toggle, error mapping, success toasts         |
+| `client/src/components/ChatLayout.tsx`      | Layout shell: Sidebar + MessageArea, mobile responsive                        |
+| `client/src/components/Sidebar.tsx`         | Tab sidebar: Chats (ConversationList) / Contacts (ContactsList)               |
+| `client/src/components/ConversationList.tsx` | Conversation items with unread count, skeleton loading                        |
+| `client/src/components/ContactsList.tsx`    | All users list from API, click-to-chat creates conversation, online dot       |
+| `client/src/components/ConversationHeader.tsx` | User name/status, back button, opens ProfileModal on click                  |
+| `client/src/components/ProfileModal.tsx`    | Dialog: avatar, name, email, joined date, online status, ESC+overlay close    |
+| `client/src/components/MessageWindow.tsx`   | Message list with infinite scroll, auto-scroll, skeleton, empty state         |
+| `client/src/components/MessageBubble.tsx`   | Message card with pulse-border for optimistic, sender avatar                  |
+| `client/src/components/MessageInput.tsx`    | Text input + image upload, keyboard submit                                    |
+| `client/src/components/SoundToggle.tsx`     | Web Audio notification sound on/off toggle in TopBar                          |
+| `client/src/components/TopBar.tsx`          | Top bar: brand, sound toggle, theme toggle, unread badge                      |
+| `client/src/contexts/SocketContext.tsx`     | Socket.IO connection, presence tracking, new_message sound, typing/read relay |
+| `client/src/contexts/AuthContext.tsx`       | Auth state: login/signup/logout/checkAuth, user profile update                |
+| `client/src/hooks/useMessages.ts`           | Message fetching with pagination, addMessage with replaceId for optimistic     |
+| `client/src/hooks/useSoundToggle.ts`        | Sound preference state (ref-based, no localStorage)                           |
+| `client/src/hooks/useTypingIndicator.ts`    | Typing start/stop emit with 4s debounce                                       |
+| `client/src/hooks/useConversations.ts`      | Live conversation list with socket update listener                            |
+| `client/src/lib/sound.ts`                   | Web Audio heartbeat chime, AudioContext singleton with beforeunload cleanup   |
+| `client/src/services/api.ts`                | Typed fetch wrapper with toast errors, AbortSignal support, upload            |
+| `client/src/types/message.types.ts`         | IMessage (with isOptimistic), IConversation, MessageStatus, socket event types |
+
 ## Server Key Files
 
 | Path                      | Purpose                                                                                       |
@@ -152,3 +180,21 @@ Optional: `PORT` (default 5000), `CLIENT_URL` (default [http://localhost:5173](h
 3. Replaced `Conversation.create()` with `new Conversation().save()` + explicit `populate()` on the document to avoid Mongoose 9 `create` return behavior.
 
 **Lesson:** Always verify MongoDB indexes match schema expectations when debugging silent write failures. A unique index created by accident (or stale from a prior schema iteration) will reject writes with E11000, and a bare `catch` that doesn't re-check can make it invisible.
+
+### 2026-07-30 — Pre-merge code review (15 issues found & fixed)
+
+**Problem:** Code review of 7 polish feature commits revealed 4 blocking, 5 important, and 6 advisory issues spanning optimistic message duplication, broken shimmer animation, dead code, ESC key conflicts, accessibility gaps, and missing error handling.
+
+**Fixes applied:**
+1. **Optimistic dedup** — `useMessages.addMessage` now accepts `replaceId` parameter. When ack returns, temp message is replaced rather than appended beside the real message.
+2. **Dead code** — Removed restore-conversation `useEffect` that could never fire (both `lastActiveRef` and `activeConversation` were cleared simultaneously).
+3. **Shimmer animation** — Added `--animate-shimmer: shimmer 1.5s ease-in-out infinite` to `@theme` in `index.css`. Tailwind v4 requires theme declarations for custom animations.
+4. **ESC conflict** — ChatPage ESC handler now checks `document.querySelector('[role="dialog"]')` before closing conversation, so ProfileModal ESC doesn't also dismiss the chat.
+5. **ProfileModal a11y** — Added `role="dialog"`, `aria-modal="true"`, `aria-label` on overlay, scroll lock (`document.body.style.overflow = 'hidden'` on mount), and `useRef` for `onClose` to avoid rebinding keydown listener on every render.
+6. **Server `createdAt`** — Added `createdAt` to `.select()` calls across contacts endpoint, conversation participant population, and message sender/receiver population. ProfileModal "Joined" date now renders correctly.
+7. **Accessibility** — SoundToggle: `aria-label`. Skeleton loaders: `role="status"` + `aria-label`. MessageSkeleton: stable widths (module-level constant, no `Math.random()` on render).
+8. **Error handling** — `api.upload` now shows `toast.error()` on failure. `api.get` accepts `AbortSignal` param. ContactsList uses `AbortController` for cleanup.
+9. **Type safety** — `handleSend` guards `user` with early return instead of non-null assertion.
+10. **Sound cleanup** — Added `closeAudioContext()` + `beforeunload` listener to close `AudioContext` singleton on page navigation.
+
+**Lesson:** Always run a structured code review before merging features. The reviewer caught 15 issues — including runtime bugs (optimistic dedup, shimmer), a11y violations, and silent failures — that would have been shipped to production. Pair the review with build verification for maximum confidence.
