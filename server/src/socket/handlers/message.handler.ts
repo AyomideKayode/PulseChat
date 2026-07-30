@@ -74,8 +74,8 @@ export async function handleSendMessage(
     });
 
     const populatedMessage = await message.populate([
-      { path: 'senderId', select: 'fullName email profilePicture' },
-      { path: 'receiverId', select: 'fullName email profilePicture' },
+      { path: 'senderId', select: 'fullName email profilePicture createdAt' },
+      { path: 'receiverId', select: 'fullName email profilePicture createdAt' },
     ]);
 
     const messageJson = populatedMessage.toObject() as unknown as IMessage;

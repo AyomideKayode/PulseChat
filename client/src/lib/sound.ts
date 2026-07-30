@@ -7,6 +7,17 @@ function getContext(): AudioContext {
   return audioCtx;
 }
 
+export function closeAudioContext() {
+  if (audioCtx) {
+    audioCtx.close();
+    audioCtx = null;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', closeAudioContext);
+}
+
 export function playMessageChime() {
   try {
     const ctx = getContext();

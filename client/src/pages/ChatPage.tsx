@@ -33,14 +33,8 @@ export default function ChatPage() {
     : null;
 
   useEffect(() => {
-    if (!activeConversation && lastActiveRef.current) {
-      setActiveConversation(lastActiveRef.current);
-    }
-  }, [activeConversation]);
-
-  useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && activeConversation) {
+      if (e.key === 'Escape' && activeConversation && !document.querySelector('[role="dialog"]')) {
         handleBack();
       }
     };
@@ -76,11 +70,12 @@ export default function ChatPage() {
   const handleSend = useCallback(
     (text?: string, image?: string) => {
       if (!otherUserId || !socket) return;
+      if (!user) return;
 
       const tempId = `temp-${Date.now()}`;
       const optimisticMessage: IMessage = {
         _id: tempId,
-        senderId: user!._id,
+        senderId: user._id,
         receiverId: otherUserId,
         text,
         image,
@@ -94,7 +89,7 @@ export default function ChatPage() {
 
       socket.emit('send_message', { receiverId: otherUserId, text, image }, (res) => {
         if (res.success && res.message) {
-          addMessage(res.message);
+          addMessage(res.message, tempId);
         } else {
           toast.error('Message failed to send');
         }

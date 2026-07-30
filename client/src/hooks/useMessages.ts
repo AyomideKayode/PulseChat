@@ -50,8 +50,12 @@ export function useMessages(userId: string | null) {
     loading,
     hasMore,
     loadMore,
-    addMessage: useCallback((m: IMessage) => {
-      setMessages((prev) => [...prev, m]);
+    addMessage: useCallback((m: IMessage, replaceId?: string) => {
+      setMessages((prev) =>
+        replaceId
+          ? [...prev.filter((x) => x._id !== replaceId), m]
+          : [...prev, m],
+      );
     }, []),
   };
 }

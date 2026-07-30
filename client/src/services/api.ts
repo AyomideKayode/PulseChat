@@ -19,7 +19,8 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get: <T>(endpoint: string) => request<T>(endpoint),
+  get: <T>(endpoint: string, opts?: { signal?: AbortSignal }) =>
+    request<T>(endpoint, opts),
   post: <T>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, { method: 'POST', body: JSON.stringify(body) }),
   put: <T>(endpoint: string, body?: unknown) =>
@@ -32,6 +33,7 @@ export const api = {
     }).then(async (res) => {
       if (!res.ok) {
         const error = await res.json().catch(() => ({ message: 'Upload failed' }));
+        toast.error(error.message ?? 'Upload failed');
         throw new Error(error.message ?? 'Upload failed');
       }
       return res.json() as Promise<T>;

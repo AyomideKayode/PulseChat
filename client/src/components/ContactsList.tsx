@@ -26,10 +26,12 @@ export default function ContactsList({ onSelectUser }: Props) {
   const { onlineUsers } = useSocket();
 
   useEffect(() => {
+    const controller = new AbortController();
     api
-      .get<IUser[]>('/messages/contacts')
+      .get<IUser[]>('/messages/contacts', { signal: controller.signal })
       .then(setContacts)
       .finally(() => setLoading(false));
+    return () => controller.abort();
   }, []);
 
   const filtered = contacts.filter((u) =>

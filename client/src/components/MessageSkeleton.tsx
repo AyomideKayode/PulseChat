@@ -1,13 +1,12 @@
-export default function MessageSkeleton() {
-  const items = Array.from({ length: 4 }).map((_, i) => {
-    const isOwn = i % 2 === 0;
-    const width = Math.random() * 30 + 30;
-    return { isOwn, width };
-  });
+const SKELETON_ITEMS = Array.from({ length: 4 }).map((_, i) => ({
+  isOwn: i % 2 === 0,
+  width: 30 + ((i * 7 + 13) % 31),
+}));
 
+export default function MessageSkeleton() {
   return (
-    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-      {items.map((item, i) => (
+    <div role="status" aria-label="Loading messages" className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+      {SKELETON_ITEMS.map((item, i) => (
         <div
           key={i}
           className={`flex ${item.isOwn ? 'justify-end' : 'justify-start'}`}

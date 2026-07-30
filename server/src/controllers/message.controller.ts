@@ -69,7 +69,7 @@ export const getAllContacts = async (req: Request, res: Response): Promise<void>
   try {
     const loggedInUserId = req.user!._id;
     const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select(
-      'fullName email profilePicture',
+      'fullName email profilePicture createdAt',
     );
 
     res.status(200).json(filteredUsers);
@@ -106,8 +106,8 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     const messages = await Message.find(filter)
       .sort({ createdAt: -1 })
       .limit(limit)
-      .populate('senderId', 'fullName email profilePicture')
-      .populate('receiverId', 'fullName email profilePicture');
+      .populate('senderId', 'fullName email profilePicture createdAt')
+      .populate('receiverId', 'fullName email profilePicture createdAt');
 
     res.status(200).json(messages.reverse());
   } catch (error) {
@@ -124,7 +124,7 @@ export const getConversations = async (req: Request, res: Response): Promise<voi
       participants: userId,
     })
       .sort({ 'lastMessage.createdAt': -1 })
-      .populate('participants', 'fullName email profilePicture');
+      .populate('participants', 'fullName email profilePicture createdAt');
 
     res.status(200).json(conversations);
   } catch (error) {

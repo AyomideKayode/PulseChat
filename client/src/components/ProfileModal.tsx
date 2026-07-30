@@ -35,6 +35,8 @@ interface Props {
 export default function ProfileModal({ user, onClose }: Props) {
   const { onlineUsers } = useSocket();
   const overlayRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   const isOnline = onlineUsers.has(user._id);
   const initials = user.fullName
@@ -45,16 +47,23 @@ export default function ProfileModal({ user, onClose }: Props) {
     .slice(0, 2);
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     }
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <div
       ref={overlayRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={user.fullName}
       onClick={(e) => e.target === overlayRef.current && onClose()}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fade-in"
     >
