@@ -134,7 +134,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updatedData },
-      { new: true },
+      { returnDocument: 'after' },
     ).select('-password');
 
     if (!updatedUser) {

@@ -109,14 +109,14 @@ PulseChat/
 - Create: `PulseChat/server/tsconfig.json`
 - Modify: `PulseChat/server/package.json`
 
-- [ ] **Step 1: Install TypeScript and type definitions**
+- [x] **Step 1: Install TypeScript and type definitions**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
 npm install --save-dev typescript @types/node @types/express @types/cookie-parser @types/bcryptjs @types/jsonwebtoken
 ```
 
-- [ ] **Step 2: Create tsconfig.json**
+- [x] **Step 2: Create tsconfig.json**
 
 Write to `PulseChat/server/tsconfig.json`:
 
@@ -144,7 +144,7 @@ Write to `PulseChat/server/tsconfig.json`:
 }
 ```
 
-- [ ] **Step 3: Update server/package.json scripts**
+- [x] **Step 3: Update server/package.json scripts**
 
 Edit `PulseChat/server/package.json` — change `"dev"` and `"start"` scripts:
 
@@ -158,7 +158,7 @@ Edit `PulseChat/server/package.json` — change `"dev"` and `"start"` scripts:
 
 Also set `"type": "module"` if not already present (check — it should be there from JS setup).
 
-- [ ] **Step 4: Add root package.json build/start scripts**
+- [x] **Step 4: Add root package.json build/start scripts**
 
 Edit `PulseChat/package.json`:
 
@@ -171,7 +171,7 @@ Edit `PulseChat/package.json`:
 }
 ```
 
-- [ ] **Step 5: Verify TypeScript compiles empty project**
+- [x] **Step 5: Verify TypeScript compiles empty project**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -191,7 +191,7 @@ Expected: No output (success). Then remove `_placeholder.ts`.
 - Create: `PulseChat/server/src/types/socket-events.types.ts`
 - Create: `PulseChat/server/src/types/express.d.ts`
 
-- [ ] **Step 1: Create user.types.ts**
+- [x] **Step 1: Create user.types.ts**
 
 ```typescript
 import { Document, Types } from 'mongoose';
@@ -228,7 +228,7 @@ export function toUserResponse(user: IUserDocument): IUserResponse {
 }
 ```
 
-- [ ] **Step 2: Create message.types.ts**
+- [x] **Step 2: Create message.types.ts**
 
 ```typescript
 import { Document, Types } from 'mongoose';
@@ -258,12 +258,13 @@ export interface SendMessagePayload {
 }
 ```
 
-- [ ] **Step 3: Create conversation.types.ts**
+- [x] **Step 3: Create conversation.types.ts**
 
 ```typescript
 import { Document, Types } from 'mongoose';
 
 export interface IConversation {
+  pairKey: string;
   participants: [Types.ObjectId, Types.ObjectId];
   lastMessage?: {
     text: string;
@@ -278,7 +279,7 @@ export interface IConversation {
 export interface IConversationDocument extends IConversation, Document {}
 ```
 
-- [ ] **Step 4: Create socket-events.types.ts**
+- [x] **Step 4: Create socket-events.types.ts**
 
 ```typescript
 import { IMessage } from './message.types.js';
@@ -310,7 +311,7 @@ export interface InterServerEvents {
 }
 ```
 
-- [ ] **Step 5: Create express.d.ts**
+- [x] **Step 5: Create express.d.ts**
 
 ```typescript
 import { IUserDocument } from './user.types.js';
@@ -335,7 +336,7 @@ declare global {
 - Create: `PulseChat/server/src/lib/arcjet.ts` (from `arcjet.js`)
 - Create: `PulseChat/server/src/lib/resend.ts` (from `resend.js`)
 
-- [ ] **Step 1: Migrate env.ts**
+- [x] **Step 1: Migrate env.ts**
 
 Read the existing `src/lib/env.js`, then rewrite as typed:
 
@@ -365,7 +366,7 @@ export const ENV = {
 } as const;
 ```
 
-- [ ] **Step 2: Migrate db.ts**
+- [x] **Step 2: Migrate db.ts**
 
 Read existing `src/lib/db.js`, convert to TS:
 
@@ -384,7 +385,7 @@ export async function connectDB(): Promise<void> {
 }
 ```
 
-- [ ] **Step 3: Migrate utils.ts**
+- [x] **Step 3: Migrate utils.ts**
 
 Read existing `src/lib/utils.js`. It should have `generateToken`:
 
@@ -408,11 +409,11 @@ export function generateToken(userId: Types.ObjectId, res: Response): void {
 }
 ```
 
-- [ ] **Step 4: Migrate cloudinary.ts, arcjet.ts, resend.ts**
+- [x] **Step 4: Migrate cloudinary.ts, arcjet.ts, resend.ts**
 
 Read each file from `src/lib/` and rewrite as TypeScript. Add explicit return types. The libraries may or may not have types — if they don't, add `// @ts-expect-error` with a brief comment, or write minimal ambient declarations.
 
-- [ ] **Step 5: Verify lib files compile**
+- [x] **Step 5: Verify lib files compile**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -429,7 +430,7 @@ Expected: No errors.
 - Create: `PulseChat/server/src/models/message.model.ts` (from `message.model.js`, extend with status)
 - Create: `PulseChat/server/src/models/conversation.model.ts` (new)
 
-- [ ] **Step 1: Create user.model.ts**
+- [x] **Step 1: Create user.model.ts**
 
 Read existing `user.model.js`, convert to TS using typed schema:
 
@@ -454,7 +455,7 @@ const User = mongoose.model<IUserDocument>('User', userSchema);
 export default User;
 ```
 
-- [ ] **Step 2: Create message.model.ts**
+- [x] **Step 2: Create message.model.ts**
 
 Read existing `message.model.js`, add `status` field:
 
@@ -495,7 +496,7 @@ const Message = mongoose.model<IMessageDocument>('Message', messageSchema);
 export default Message;
 ```
 
-- [ ] **Step 3: Create conversation.model.ts**
+- [x] **Step 3: Create conversation.model.ts**
 
 ```typescript
 import mongoose, { Schema } from 'mongoose';
@@ -503,6 +504,7 @@ import { IConversationDocument } from '../types/conversation.types.js';
 
 const conversationSchema = new Schema<IConversationDocument>(
   {
+    pairKey: { type: String, required: true, unique: true },
     participants: {
       type: [Schema.Types.ObjectId],
       ref: 'User',
@@ -526,20 +528,15 @@ const conversationSchema = new Schema<IConversationDocument>(
   { timestamps: true },
 );
 
-conversationSchema.index(
-  { participants: 1 },
-  {
-    unique: true,
-    // Ensure [A,B] and [B,A] are treated as the same conversation
-    // This is enforced at query time, not index time
-  },
-);
+conversationSchema.index({ participants: 1 });
 
 const Conversation = mongoose.model<IConversationDocument>('Conversation', conversationSchema);
 export default Conversation;
 ```
 
-- [ ] **Step 4: Verify models compile**
+> **Note:** `pairKey` (derived from sorted participant IDs joined by `:`) with `{ unique: true }` prevents duplicate conversations at the DB level, unlike a multikey unique index on the `participants` array which would incorrectly restrict each user to a single conversation.
+
+- [x] **Step 4: Verify models compile**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -555,7 +552,7 @@ Expected: No errors.
 - Create: `PulseChat/server/src/middleware/auth.middleware.ts` (from `auth.middleware.js`)
 - Create: `PulseChat/server/src/middleware/arcjet.middleware.ts` (from `arcjet.middleware.js`)
 
-- [ ] **Step 1: Create auth.middleware.ts**
+- [x] **Step 1: Create auth.middleware.ts**
 
 Read existing `auth.middleware.js`. Convert to TS:
 
@@ -599,7 +596,7 @@ export const protectRoute = async (
 };
 ```
 
-- [ ] **Step 2: Create arcjet.middleware.ts**
+- [x] **Step 2: Create arcjet.middleware.ts**
 
 Read existing `arcjet.middleware.js`. Convert to TS:
 
@@ -645,7 +642,7 @@ export const arcjetProtection = async (
 };
 ```
 
-- [ ] **Step 3: Verify middleware compiles**
+- [x] **Step 3: Verify middleware compiles**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -661,252 +658,19 @@ Expected: No errors.
 - Create: `PulseChat/server/src/controllers/auth.controller.ts` (from `auth.controller.js`)
 - Create: `PulseChat/server/src/controllers/message.controller.ts` (from `message.controller.js`, add new endpoints)
 
-- [ ] **Step 1: Create auth.controller.ts**
+- [x] **Step 1: Create auth.controller.ts**
 
-Read existing `auth.controller.js`. Convert to TS. Update `generateToken` import, add types to request/response.
+(Content migrated — signup, login, logout, updateProfile, checkAuth with types)
 
-Key changes from JS version:
+- [x] **Step 2: Create message.controller.ts**
 
-- Add explicit `Request`, `Response` types
-- Typed request body access
-- Use `toUserResponse()` for responses
+Controllers migrated with `getAllContacts`, `getMessages`, `getConversations`, and `uploadFile`:
 
-```typescript
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import { sendWelcomeEmail } from '../emails/emailHandlers.js';
-import { generateToken } from '../lib/utils.js';
-import { ENV } from '../lib/env.js';
-import cloudinary from '../lib/cloudinary.js';
-import User from '../models/user.model.js';
-import { toUserResponse } from '../types/user.types.js';
-
-export const signup = async (req: Request, res: Response): Promise<void> => {
-  const { fullName, email, password } = req.body as {
-    fullName?: string;
-    email?: string;
-    password?: string;
-  };
-
-  try {
-    if (!fullName || !email || !password) {
-      res.status(400).json({ message: 'All fields are required.' });
-      return;
-    }
-
-    if (password.length < 8) {
-      res.status(400).json({ message: 'Password must be at least 8 characters long.' });
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      res.status(400).json({ message: 'Invalid email format.' });
-      return;
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      res.status(400).json({ message: 'Unable to create account with provided details.' });
-      return;
-    }
-
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User({ fullName, email, password: hashedPassword });
-    const savedUser = await newUser.save();
-    generateToken(savedUser._id, res);
-
-    try {
-      await sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL);
-    } catch (error) {
-      console.error('Failed to send welcome email (non-blocking):', error);
-    }
-
-    res.status(201).json(toUserResponse(savedUser));
-  } catch (error) {
-    console.error('Error during signup:', error);
-    res.status(500).json({ message: 'Internal server error.' });
-  }
-};
-
-export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body as { email?: string; password?: string };
-
-  try {
-    if (!email || !password) {
-      res.status(400).json({ message: 'All fields are required.' });
-      return;
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      res.status(400).json({ message: 'Invalid credentials provided.' });
-      return;
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      res.status(400).json({ message: 'Invalid credentials provided.' });
-      return;
-    }
-
-    generateToken(user._id, res);
-    res.status(200).json(toUserResponse(user));
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Internal server error.' });
-  }
-};
-
-export const logout = (_req: Request, res: Response): void => {
-  res.cookie('jwt', '', { maxAge: 0 });
-  res.status(200).json({ message: 'Logged out successfully.' });
-};
-
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { fullName, profilePicture } = req.body as {
-      fullName?: string;
-      profilePicture?: string;
-    };
-    const userId = req.user!._id;
-
-    if (!fullName && !profilePicture) {
-      res.status(400).json({ message: 'At least one field is required' });
-      return;
-    }
-
-    const updatedData: Record<string, unknown> = {};
-    if (fullName) updatedData.fullName = fullName;
-
-    if (profilePicture) {
-      const currentUser = await User.findById(userId);
-      if (!currentUser) {
-        res.status(404).json({ message: 'User not found.' });
-        return;
-      }
-
-      if (currentUser.profilePicture?.publicId) {
-        try {
-          await cloudinary.uploader.destroy(currentUser.profilePicture.publicId);
-        } catch (destroyError) {
-          console.error('Failed to delete old profile picture:', destroyError);
-        }
-      }
-
-      const uploadResponse = await cloudinary.uploader.upload(profilePicture);
-      updatedData.profilePicture = {
-        url: uploadResponse.secure_url,
-        publicId: uploadResponse.public_id,
-      };
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $set: updatedData },
-      { new: true },
-    ).select('-password');
-    if (!updatedUser) {
-      res.status(404).json({ message: 'User not found.' });
-      return;
-    }
-
-    res.status(200).json(toUserResponse(updatedUser));
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    res.status(500).json({ message: 'Internal server error.' });
-  }
-};
-
-export const checkAuth = async (req: Request, res: Response): Promise<void> => {
-  res.status(200).json(toUserResponse(req.user!));
-};
-```
-
-- [ ] **Step 2: Create message.controller.ts**
-
-Read existing `message.controller.js`. Convert to TS and expand with new endpoints:
-
-```typescript
-import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import Message from '../models/message.model.js';
-import User from '../models/user.model.js';
-import Conversation from '../models/conversation.model.js';
-
-export const getAllContacts = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const loggedInUserId = req.user!._id;
-    const filteredUsers = await User.find(
-      { _id: { $ne: loggedInUserId } },
-      'fullName email profilePicture',
-    ).select('-password');
-
-    res.status(200).json(filteredUsers);
-  } catch (error) {
-    console.error('Error fetching contacts:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const getMessages = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userId } = req.params;
-    const loggedInUserId = req.user!._id;
-
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      res.status(400).json({ message: 'Invalid user ID' });
-      return;
-    }
-
-    const { before } = req.query as { before?: string };
-    const limit = 50;
-
-    const filter: Record<string, unknown> = {
-      $or: [
-        { senderId: loggedInUserId, receiverId: userId },
-        { senderId: userId, receiverId: loggedInUserId },
-      ],
-    };
-
-    if (before && mongoose.Types.ObjectId.isValid(before)) {
-      filter._id = { $lt: new mongoose.Types.ObjectId(before) };
-    }
-
-    const messages = await Message.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .populate('senderId', 'fullName email profilePicture')
-      .populate('receiverId', 'fullName email profilePicture');
-
-    res.status(200).json(messages.reverse());
-  } catch (error) {
-    console.error('Error fetching messages:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const getConversations = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const userId = req.user!._id;
-
-    const conversations = await Conversation.find({
-      participants: userId,
-    })
-      .sort({ 'lastMessage.createdAt': -1 })
-      .populate('participants', 'fullName email profilePicture');
-
-    res.status(200).json(conversations);
-  } catch (error) {
-    console.error('Error fetching conversations:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-```
-
-- [ ] **Step 3: Verify controllers compile**
+- `getAllContacts` — uses inclusion projection `.select('fullName email profilePicture')`
+- `getMessages` — cursor-based pagination via `?before=<messageId>`, sorted by createdAt desc, limited to 50
+- `getConversations` — finds conversations by participant, sorted by lastMessage.createdAt desc, populated
+- `uploadFile` — multer memoryStorage → base64 → Cloudinary upload (`pulsechat/messages` folder, `resource_type: 'image'`)
+- [x] **Step 3: Verify controllers compile**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -924,7 +688,7 @@ Expected: No errors.
 - Create: `PulseChat/server/src/routes/conversation.route.ts` (new)
 - Create: `PulseChat/server/src/server.ts` (from `server.js`, add Socket.IO setup skeleton)
 
-- [ ] **Step 1: Create auth.route.ts**
+- [x] **Step 1: Create auth.route.ts**
 
 ```typescript
 import { Router } from 'express';
@@ -945,21 +709,36 @@ router.get('/check', protectRoute, checkAuth);
 export default router;
 ```
 
-- [ ] **Step 2: Create message.route.ts**
+- [x] **Step 2: Create message.route.ts**
 
 ```typescript
 import { Router } from 'express';
-import { getAllContacts } from '../controllers/message.controller.js';
+import multer from 'multer';
+import { getAllContacts, getMessages, uploadFile } from '../controllers/message.controller.js';
 import { protectRoute } from '../middleware/auth.middleware.js';
 
 const router = Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image files are allowed'));
+    }
+    cb(null, true);
+  },
+});
 
 router.get('/contacts', protectRoute, getAllContacts);
+router.get('/:userId', protectRoute, getMessages);
+router.post('/upload', protectRoute, upload.single('image'), uploadFile);
 
 export default router;
 ```
 
-- [ ] **Step 3: Create conversation.route.ts**
+Note: `/contacts` must be registered before `/:userId` to prevent the param route from catching "contacts" as a userId.
+
+- [x] **Step 3: Create conversation.route.ts**
 
 ```typescript
 import { Router } from 'express';
@@ -973,7 +752,7 @@ router.get('/', protectRoute, getConversations);
 export default router;
 ```
 
-- [ ] **Step 4: Create server.ts**
+- [x] **Step 4: Create server.ts**
 
 ```typescript
 import express from 'express';
@@ -983,11 +762,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 
+import helmet from 'helmet';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import conversationRoutes from './routes/conversation.route.js';
 import { connectDB } from './lib/db.js';
 import { ENV } from './lib/env.js';
+import { setupSocket } from './socket/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -999,13 +780,13 @@ const PORT = ENV.PORT || 5000;
 
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
+app.use(helmet());
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/conversations', conversationRoutes);
 
-// Socket.IO (wired in Phase 2)
 const io = new Server(httpServer, {
   cors: {
     origin: ENV.CLIENT_URL,
@@ -1013,7 +794,7 @@ const io = new Server(httpServer, {
   },
 });
 
-// TODO: Phase 2 — wire Socket.IO auth middleware and event handlers
+setupSocket(io);
 
 // Serve static frontend in production
 if (ENV.NODE_ENV === 'production') {
@@ -1039,7 +820,7 @@ try {
 }
 ```
 
-- [ ] **Step 5: Remove old .js files**
+- [x] **Step 5: Remove old .js files**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -1053,7 +834,7 @@ rm src/routes/auth.route.js src/routes/message.route.js
 rm src/server.js
 ```
 
-- [ ] **Step 6: Full compile check**
+- [x] **Step 6: Full compile check**
 
 ```bash
 cd /home/ayomide/sandbox/PulseChat/server
@@ -1068,25 +849,26 @@ Expected: Zero errors.
 
 ### Task 2.1: Build Socket.IO infrastructure
 
-- [ ] Install `socket.io` if not already (`npm install socket.io`)
-- [ ] Create `src/socket/auth.ts` — parse JWT from `socket.handshake.headers.cookie`, attach user to `socket.data.user`
-- [ ] Create `src/socket/presence.ts` — `Map<userId, Set<socketId>>`, join room `user:<userId>`, broadcast online/offline
-- [ ] Create `src/socket/handlers/message.handler.ts` — `send_message`: validate, persist, upsert Conversation, emit `new_message`
-- [ ] Create `src/socket/handlers/typing.handler.ts` — `typing_start` / `typing_stop`: relay to receiver room
-- [ ] Create `src/socket/handlers/read.handler.ts` — `mark_read`: reset unread counts, update message statuses
-- [ ] Create `src/socket/index.ts` — init Socket.IO with CORS, wire middleware + handlers
-- [ ] Wire `io` into `server.ts` (replace `// TODO`)
-- [ ] Add in-memory rate limiter for `send_message` (30/10s per user)
+- [x] Install `socket.io` if not already (`npm install socket.io`)
+- [x] Create `src/socket/auth.ts` — parse JWT from `socket.handshake.headers.cookie`, attach user to `socket.data.user`
+- [x] Create `src/socket/presence.ts` — `Map<userId, Set<socketId>>`, join room `user:<userId>`, broadcast online/offline
+- [x] Create `src/socket/handlers/message.handler.ts` — `send_message`: validate, persist, upsert Conversation by `pairKey`, emit `new_message`
+- [x] Create `src/socket/handlers/typing.handler.ts` — `typing_start` / `typing_stop`: relay to receiver room
+- [x] Create `src/socket/handlers/read.handler.ts` — `mark_read`: verify participant, reset unread counts, update message statuses
+- [x] Create `src/socket/index.ts` — init Socket.IO with CORS, wire middleware + handlers
+- [x] Wire `io` into `server.ts` (replace `// TODO`)
+- [x] Add in-memory rate limiter for `send_message` (30/10s per user)
 
 ### Task 2.2: Build remaining REST endpoints
 
-- [ ] Add `GET /api/messages/:userId` to message route (cursor pagination)
-- [ ] Add `POST /api/messages/upload` (multer + Cloudinary)
-- [ ] Wire `GET /api/conversations`
+- [x] Add `GET /api/messages/:userId` to message route (cursor pagination)
+- [x] Add `POST /api/messages/upload` (multer + Cloudinary, image/* fileFilter, 5MB limit)
+- [x] Wire `GET /api/conversations`
 
 ### Task 2.3: Manual smoke test
 
-- [ ] Start server, verify two browser clients can connect, send messages, see typing indicators, see online status
+- [x] Start server, verify two browser clients can connect, send messages, see typing indicators, see online status
+- [x] REST endpoints verified: login, signup, contacts, messages, upload
 
 ---
 
