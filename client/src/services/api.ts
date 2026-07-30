@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 const BASE_URL = '/api';
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -9,6 +11,7 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: 'Request failed' }));
+    toast.error(error.message ?? 'Request failed');
     throw new Error(error.message ?? 'Request failed');
   }
 

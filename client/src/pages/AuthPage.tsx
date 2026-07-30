@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 
 const USER_ERRORS: Record<string, string> = {
@@ -35,8 +36,10 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await login({ email, password });
+        toast.success('Welcome back!');
       } else {
         await signup({ fullName, email, password });
+        toast.success('Account created successfully!');
       }
       navigate('/');
     } catch (err) {
