@@ -15,6 +15,7 @@ export interface IMessage {
   text?: string;
   image?: string;
   status: MessageStatus;
+  isOptimistic?: boolean;
   createdAt: string;
   updatedAt: string;
 }

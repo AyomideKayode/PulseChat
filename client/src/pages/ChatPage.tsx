@@ -8,7 +8,9 @@ import ConversationHeader from '../components/ConversationHeader';
 import MessageWindow from '../components/MessageWindow';
 import MessageInput from '../components/MessageInput';
 import TypingIndicator from '../components/TypingIndicator';
+import { MessageStatus } from '../types/message.types';
 import type { IConversation, IMessage } from '../types/message.types';
+import { toast } from 'sonner';
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -74,13 +76,31 @@ export default function ChatPage() {
   const handleSend = useCallback(
     (text?: string, image?: string) => {
       if (!otherUserId || !socket) return;
+
+      const tempId = `temp-${Date.now()}`;
+      const optimisticMessage: IMessage = {
+        _id: tempId,
+        senderId: user!._id,
+        receiverId: otherUserId,
+        text,
+        image,
+        status: MessageStatus.Sent,
+        isOptimistic: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      addMessage(optimisticMessage);
+
       socket.emit('send_message', { receiverId: otherUserId, text, image }, (res) => {
         if (res.success && res.message) {
           addMessage(res.message);
+        } else {
+          toast.error('Message failed to send');
         }
       });
     },
-    [otherUserId, socket, addMessage],
+    [otherUserId, socket, addMessage, user],
   );
 
   const other = activeConversation

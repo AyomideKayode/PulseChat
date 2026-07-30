@@ -42,7 +42,7 @@ export default function MessageBubble({ message, isOwn }: Props) {
         </div>
       )}
       <div
-        className={`max-w-[70%] px-3.5 py-2.5 rounded-xl ${isOwn ? 'bg-bubble-sent' : 'bg-card'} text-text-primary`}
+        className={`max-w-[70%] px-3.5 py-2.5 rounded-xl ${isOwn ? 'bg-bubble-sent' : 'bg-card'} text-text-primary ${message.isOptimistic ? 'animate-pulse-border' : ''}`}
       >
         {message.text && <p className="text-[0.9375rem] leading-[1.4]">{message.text}</p>}
         {message.image && (
