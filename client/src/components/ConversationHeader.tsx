@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useSocket } from '../contexts/SocketContext';
-import type { IConversation } from '../types/message.types';
 import { useAuth } from '../contexts/AuthContext';
 import { useMobile } from '../contexts/MobileContext';
+import ProfileModal from './ProfileModal';
+import type { IConversation } from '../types/message.types';
 
 interface Props {
   conversation: IConversation;
@@ -10,6 +12,7 @@ interface Props {
 }
 
 export default function ConversationHeader({ conversation, onBack }: Props) {
+  const [showProfile, setShowProfile] = useState(false);
   const { onlineUsers } = useSocket();
   const { user } = useAuth();
   const { isMobile } = useMobile();
@@ -28,21 +31,34 @@ export default function ConversationHeader({ conversation, onBack }: Props) {
   }
 
   return (
-    <div className="px-4 py-3 border-b border-border flex items-center gap-3">
-      {isMobile && (
+    <>
+      <div className="px-4 py-3 border-b border-border flex items-center gap-3">
+        {isMobile && (
+          <button
+            onClick={handleBack}
+            className="bg-transparent border-none text-text-secondary cursor-pointer p-1 flex"
+          >
+            <ArrowLeft size={20} />
+          </button>
+        )}
         <button
-          onClick={handleBack}
-          className="bg-transparent border-none text-text-secondary cursor-pointer p-1 flex"
+          onClick={() => setShowProfile(true)}
+          className="bg-transparent border-none text-left cursor-pointer flex-1"
         >
-          <ArrowLeft size={20} />
+          <p className="font-semibold text-[0.9375rem] text-text-primary">
+            {other?.fullName ?? 'Unknown'}
+          </p>
+          <p className={`text-xs ${isOnline ? 'text-online' : 'text-text-secondary'}`}>
+            {isOnline ? 'Online' : 'Offline'}
+          </p>
         </button>
-      )}
-      <div>
-        <p className="font-semibold text-[0.9375rem]">{other?.fullName ?? 'Unknown'}</p>
-        <p className={`text-xs ${isOnline ? 'text-online' : 'text-text-secondary'}`}>
-          {isOnline ? 'Online' : 'Offline'}
-        </p>
       </div>
-    </div>
+      {showProfile && other && (
+        <ProfileModal
+          user={other}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
+    </>
   );
 }
