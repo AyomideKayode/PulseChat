@@ -12,7 +12,7 @@ function App() {
       <AuthProvider>
         <Toaster
           richColors
-          position="bottomCenter"
+          position="bottom-center"
           toastOptions={{
             style: {
               background: '#242120',
